@@ -8,7 +8,7 @@ import static gimbalabs.unsigsbe.Constants.*;
 
 public class Util {
 
-    public static Map<String,Object> newPagedResponseMap() {
+    public static Map<String, Object> newPagedResponseMap() {
         Map<String, Object> map = new HashMap<>();
         map.put(RESULT_LIST, Collections.emptyList());
         map.put(LIST_SIZE, 0);

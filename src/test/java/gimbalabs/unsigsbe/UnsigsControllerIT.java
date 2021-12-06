@@ -1,6 +1,5 @@
 package gimbalabs.unsigsbe;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,15 +21,15 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import static gimbalabs.unsigsbe.Constants.RESULT_LIST;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import static gimbalabs.unsigsbe.Constants.*;
 
 @ExtendWith({MockitoExtension.class, RestDocumentationExtension.class, SpringExtension.class})
 public class UnsigsControllerIT extends UnsigsBeApplicationTests {
@@ -100,7 +99,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                 .andReturn().getResponse();
 
         long newCount = offerRepository.count();
-        assertEquals(initialCount+2, newCount);
+        assertEquals(initialCount + 2, newCount);
 
 
         response = mockMvc.perform(
@@ -117,7 +116,6 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         List<Map> resList = (List<Map>) map.get(RESULT_LIST);
         assertEquals(initialCount + 2, resList.size());
     }
-
 
 
 }

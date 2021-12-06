@@ -1,6 +1,5 @@
 package gimbalabs.unsigsbe;
 
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +18,11 @@ public class UnsigsController {
 
     public UnsigsController(UnsigsService service) {
         this.service = service;
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ok("Hello world");
     }
 
     @GetMapping("/offers")
