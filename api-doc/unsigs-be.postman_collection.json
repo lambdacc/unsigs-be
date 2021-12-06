@@ -1,0 +1,96 @@
+{
+	"variables": [],
+	"info": {
+		"name": "unsigs-be",
+		"_postman_id": "b633dc32-e7a4-3cc3-b5fe-45c49e6fb04e",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8088/api/v1/ping/",
+			"request": {
+				"url": "http://localhost:8088/api/v1/ping/",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Ping the server"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/api/v1/offers",
+			"request": {
+				"url": "http://localhost:8088/api/v1/offers/",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n    \"unsigId\" : 12,\n    \"owner\" : \"2341asd-1e40-40a8-b4a2-0201a4c93ecf\",\n    \"amount\" : 1123456\n    }"
+				},
+				"description": "Create or update offer"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8088/api/v1/offers/",
+			"request": {
+				"url": "http://localhost:8088/api/v1/offers",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get all offers at present"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8088/api/v1/offers/ copy",
+			"request": {
+				"url": {
+					"raw": "http://localhost:8088/api/v1/offers?pageNo=2&pageSize=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"offers"
+					],
+					"query": [
+						{
+							"key": "pageNo",
+							"value": "2",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "pageSize",
+							"value": "5",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get all offers at present - Second page"
+			},
+			"response": []
+		}
+	]
+}
