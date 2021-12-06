@@ -20,9 +20,9 @@ cd $PROJECT_ROOT_DIR - This is the same directory where pom.xml is.
 
 4. To ping the server, hit this url.
    `http://localhost:8088/api/v1/ping/`
-   Response
+   Response will be
    `Hello world`
 
-5. The data will be stored at the mounted location, here it was `~/data` .
+5. The data related to offers will be stored as a file based db at the mounted location, here it was `~/data` .
 
 6. Under the `api-doc` directory, you will find api documentation and sample Postman collection
