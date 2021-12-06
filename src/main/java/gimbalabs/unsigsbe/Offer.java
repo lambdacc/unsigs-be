@@ -12,5 +12,4 @@ public class Offer {
     @NotNull (message = "amount is required")
     public Long amount;
 
-
 }

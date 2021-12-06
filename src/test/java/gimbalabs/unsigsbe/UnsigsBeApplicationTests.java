@@ -3,12 +3,14 @@ package gimbalabs.unsigsbe;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:local-test-application.properties")
 class UnsigsBeApplicationTests {
+    protected JacksonJsonParser jsonParser = new JacksonJsonParser();
 
     @Autowired
     ObjectMapper objectMapper;

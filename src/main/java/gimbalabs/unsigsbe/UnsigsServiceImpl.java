@@ -5,7 +5,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static gimbalabs.unsigsbe.Constants.*;
+
 
 @Service
 public class UnsigsServiceImpl implements UnsigsService {
@@ -17,9 +21,28 @@ public class UnsigsServiceImpl implements UnsigsService {
     }
 
     @Override
-    public Page<OfferEntity> listOffers(Integer pageNo, Integer pageSize) {
+    public Map<String, Object> listOffers(Integer pageNo, Integer pageSize) {
         Pageable paging = PageRequest.of(pageNo, pageSize);
-        return offerRepository.findAll(paging);
+        Page<OfferEntity> pagedResult = offerRepository.findAll(paging);
+        Map<String, Object> resultMap = Util.newPagedResponseMap();
+        if (pagedResult.isEmpty()) {
+            return resultMap;
+        }
+
+        List<Offer> content = pagedResult.stream().map(this::buildOfferDto).collect(Collectors.toList());
+        resultMap.put(RESULT_LIST, content);
+        resultMap.put(LIST_SIZE, content.size());
+        resultMap.put(TOTAL_PAGES, pagedResult.getTotalPages());
+        resultMap.put(HAS_NEXT_PAGE, pagedResult.hasNext());
+        return resultMap;
+    }
+
+    private Offer buildOfferDto(OfferEntity e) {
+        Offer o = new Offer();
+        o.unsigId = e.getUnsigId();
+        o.owner = e.getOwner();
+        o.amount = e.getAmount();
+        return o;
     }
 
     @Override
