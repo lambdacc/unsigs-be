@@ -1,6 +1,6 @@
 ### Running the server with docker
 
-cd $PROJECT_DIR
+cd $PROJECT_ROOT_DIR - This is the same directory where pom.xml is.
 
 1. Build the code base using maven wrapper.
 
