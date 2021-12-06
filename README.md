@@ -24,3 +24,5 @@ cd $PROJECT_ROOT_DIR - This is the same directory where pom.xml is.
    `Hello world`
 
 5. The data will be stored at the mounted location, here it was `~/data` .
+
+6. Under the `api-doc` directory, you will find api documentation and sample Postman collection
