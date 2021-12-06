@@ -8,7 +8,7 @@ cd $PROJECT_ROOT_DIR - This is the same directory where pom.xml is.
 
 2. Build docker image
 
-   `sudo docker build -t unsigs-be .`
+   `sudo docker build -t unsigs-be:0.1 .`
 
    Check that the image is built
 
