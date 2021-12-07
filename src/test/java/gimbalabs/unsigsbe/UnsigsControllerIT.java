@@ -71,7 +71,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
 
     private Offer newOffer() {
         Offer o = new Offer();
-        o.unsigId = Math.abs(new Random().nextLong());
+        o.unsigId = String.valueOf(Math.abs(new Random().nextLong()));
         o.owner = UUID.randomUUID().toString();
         o.amount = 10202020L;
         return o;
@@ -79,7 +79,6 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
 
     @Test
     public void whenCreateAndListOffers_thenOk() throws Exception {
-
         long initialCount = offerRepository.count();
         Offer o = newOffer();
         MockHttpServletResponse response = mockMvc.perform(

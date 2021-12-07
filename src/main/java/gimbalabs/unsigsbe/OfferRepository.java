@@ -8,5 +8,5 @@ import java.util.Optional;
 @Service
 public interface OfferRepository extends JpaRepository<OfferEntity, Long> {
 
-    Optional<OfferEntity> findByUnsigId(Long unsigId);
+    Optional<OfferEntity> findByUnsigId(String unsigId);
 }
