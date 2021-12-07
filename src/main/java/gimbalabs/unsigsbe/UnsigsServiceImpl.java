@@ -3,9 +3,10 @@ package gimbalabs.unsigsbe;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.utility.Iterate;
 import org.eclipse.collections.impl.utility.ListIterate;
-import org.springframework.beans.BeanUtils;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,10 +26,12 @@ public class UnsigsServiceImpl implements UnsigsService {
 
     private final OfferRepository offerRepository;
     private final UnsigDetailsRepository unsigDetailsRepository;
+    private final JacksonJsonParser jsonParser;
 
-    public UnsigsServiceImpl(OfferRepository offerRepository, UnsigDetailsRepository unsigDetailsRepository) {
+    public UnsigsServiceImpl(OfferRepository offerRepository, UnsigDetailsRepository unsigDetailsRepository, JacksonJsonParser jsonParser) {
         this.offerRepository = offerRepository;
         this.unsigDetailsRepository = unsigDetailsRepository;
+        this.jsonParser = jsonParser;
     }
 
     @Override
@@ -41,6 +44,24 @@ public class UnsigsServiceImpl implements UnsigsService {
         }
 
         List<Offer> content = pagedResult.stream().map(this::buildOfferDto).collect(Collectors.toList());
+        resultMap.put(RESULT_LIST, content);
+        resultMap.put(LIST_SIZE, content.size());
+        resultMap.put(TOTAL_PAGES, pagedResult.getTotalPages());
+        resultMap.put(HAS_NEXT_PAGE, pagedResult.hasNext());
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> listUnsigs(Integer pageNo, Integer pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize);
+        Page<UnsigDetailsEntity> pagedResult = unsigDetailsRepository.findAll(paging);
+        Map<String, Object> resultMap = Util.newPagedResponseMap();
+        if (pagedResult.isEmpty()) {
+            return resultMap;
+        }
+
+        MutableList<Object> content = ListIterate.collect(pagedResult.getContent(),
+                e -> UnifiedMap.newWithKeysValues(e.getUnsigId(), jsonParser.parseMap(e.getDetails())));
         resultMap.put(RESULT_LIST, content);
         resultMap.put(LIST_SIZE, content.size());
         resultMap.put(TOTAL_PAGES, pagedResult.getTotalPages());
@@ -78,14 +99,16 @@ public class UnsigsServiceImpl implements UnsigsService {
             Collection<String> unsigIds = Iterate.collect(unsigDetailsChunk, e -> e.unsigId);
             List<UnsigDetailsEntity> unsigEntitiesInDb = unsigDetailsRepository.findByUnsigIdIn(unsigIds);
 
-            RichIterable<UnsigDetailsEntity> allToSave = unsigDetailsChunk.collect(new Function<UnsigDetails, UnsigDetailsEntity>() {
-                                                                                     @Override
-                                                                                     public UnsigDetailsEntity valueOf(UnsigDetails details) {
-                                                                                         UnsigDetailsEntity entity = ListIterate.detectOptional(unsigEntitiesInDb, e -> e.getUnsigId().equals(details.unsigId)).orElse(new UnsigDetailsEntity());
-                                                                                         BeanUtils.copyProperties(details, entity);
-                                                                                         return entity;
-                                                                                     }
-                                                                                 }
+            RichIterable<UnsigDetailsEntity> allToSave = unsigDetailsChunk.collect(
+                    new Function<UnsigDetails, UnsigDetailsEntity>() {
+                        @Override
+                        public UnsigDetailsEntity valueOf(UnsigDetails details) {
+                            UnsigDetailsEntity entity = ListIterate.detectOptional(unsigEntitiesInDb, e -> e.getUnsigId().equals(details.unsigId)).orElse(new UnsigDetailsEntity());
+                            entity.setUnsigId(details.unsigId);
+                            entity.setDetails(details.details);
+                            return entity;
+                        }
+                    }
             );
 
             unsigDetailsRepository.saveAll(allToSave);

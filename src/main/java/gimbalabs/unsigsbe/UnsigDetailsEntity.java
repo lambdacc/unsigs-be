@@ -10,10 +10,11 @@ public class UnsigDetailsEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(name = "unsig_id",unique = true)
+    @Column(name = "unsig_id", unique = true)
     private String unsigId;
 
-    @Column(name = "details")
+    @Column(name = "details", columnDefinition = "clob")
+    @Lob
     private String details;
 
     public long getId() {

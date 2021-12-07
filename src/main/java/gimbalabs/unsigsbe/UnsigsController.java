@@ -39,4 +39,11 @@ public class UnsigsController {
         return accepted().body(service.saveOffer(offer));
     }
 
+    @GetMapping("/unsigs")
+    public ResponseEntity<Map<String, Object>> listUnsigs(
+            @RequestParam(required = false, defaultValue = "0") Integer pageNo,
+            @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return ok(service.listUnsigs(pageNo, pageSize));
+    }
+
 }
