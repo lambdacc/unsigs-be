@@ -9,6 +9,8 @@ public interface UnsigsService {
 
     Map<String, Object> listUnsigs(Integer pageNo, Integer pageSize);
 
+    UnsigDetailsEntity getUnsig(String unsigId);
+
     OfferEntity saveOffer(Offer offer);
 
     boolean saveUnsigDetails(MutableList<UnsigDetails> unsigDetailsList);

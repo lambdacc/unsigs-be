@@ -69,6 +69,12 @@ public class UnsigsServiceImpl implements UnsigsService {
         return resultMap;
     }
 
+    @Override
+    public UnsigDetailsEntity getUnsig(String unsigId) {
+        UnsigDetailsEntity unsigE = unsigDetailsRepository.findByUnsigId(unsigId).orElseThrow();
+        return unsigE;
+    }
+
     private Offer buildOfferDto(OfferEntity e) {
         Offer o = new Offer();
         o.unsigId = e.getUnsigId();

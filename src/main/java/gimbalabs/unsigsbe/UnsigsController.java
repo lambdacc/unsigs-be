@@ -46,4 +46,10 @@ public class UnsigsController {
         return ok(service.listUnsigs(pageNo, pageSize));
     }
 
+    @GetMapping("/unsigs/{unsigId}")
+    public ResponseEntity<UnsigDetailsEntity> listUnsigs(
+            @PathVariable String unsigId) {
+        return ok(service.getUnsig(unsigId));
+    }
+
 }
