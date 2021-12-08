@@ -8,18 +8,18 @@
 	},
 	"item": [
 		{
-			"name": "http://localhost:8088/api/v1/ping/",
+			"name": "Ping the server",
 			"request": {
 				"url": "http://localhost:8088/api/v1/ping/",
 				"method": "GET",
 				"header": [],
 				"body": {},
-				"description": "Ping the server"
+				"description": "Ping the server. This just tells you if the server is up."
 			},
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/api/v1/offers",
+			"name": "Create / update offer",
 			"request": {
 				"url": "http://localhost:8088/api/v1/offers/",
 				"method": "PUT",
@@ -44,18 +44,67 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8088/api/v1/offers/",
+			"name": "List offers",
 			"request": {
 				"url": "http://localhost:8088/api/v1/offers",
 				"method": "GET",
 				"header": [],
 				"body": {},
-				"description": "Get all offers at present"
+				"description": "Paginated listing of latest offers"
 			},
 			"response": []
 		},
 		{
-			"name": "http://localhost:8088/api/v1/offers/ copy",
+			"name": "List unsigs",
+			"request": {
+				"url": {
+					"raw": "http://localhost:8088/api/v1/unsigs?pageNo=2&pageSize=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"unsigs"
+					],
+					"query": [
+						{
+							"key": "pageNo",
+							"value": "2",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "pageSize",
+							"value": "10",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Paginated listing of unsigs"
+			},
+			"response": []
+		},
+		{
+			"name": "Load unsig master data",
+			"request": {
+				"url": "http://localhost:8088/api/v1/load-data",
+				"method": "POST",
+				"header": [],
+				"body": {},
+				"description": "Load unsig master data"
+			},
+			"response": []
+		},
+		{
+			"name": "List offers with  page number and size params",
 			"request": {
 				"url": {
 					"raw": "http://localhost:8088/api/v1/offers?pageNo=2&pageSize=5",

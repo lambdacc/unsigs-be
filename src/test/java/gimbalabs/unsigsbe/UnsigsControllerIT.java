@@ -168,7 +168,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(document("{class-name}-{method-name}-listUnsigs",
+                .andDo(document("{class-name}-{method-name}-list",
                         preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
                 .andReturn().getResponse();
 
@@ -185,13 +185,14 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(document("{class-name}-{method-name}-listUnsigs",
+                .andDo(document("{class-name}-{method-name}-get",
                         preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
                 .andReturn().getResponse();
 
         rspMap = jsonParser.parseMap(response.getContentAsString());
         String id = (String) rspMap.get("unsigId");
         assertEquals(id, key);
+        Map detailsMap = (Map) rspMap.get("details");
 
 
     }

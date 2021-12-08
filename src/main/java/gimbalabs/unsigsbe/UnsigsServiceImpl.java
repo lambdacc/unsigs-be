@@ -1,5 +1,7 @@
 package gimbalabs.unsigsbe;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.list.MutableList;
@@ -7,11 +9,15 @@ import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.utility.Iterate;
 import org.eclipse.collections.impl.utility.ListIterate;
 import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +33,13 @@ public class UnsigsServiceImpl implements UnsigsService {
     private final OfferRepository offerRepository;
     private final UnsigDetailsRepository unsigDetailsRepository;
     private final JacksonJsonParser jsonParser;
+    private final ObjectMapper objectMapper;
 
-    public UnsigsServiceImpl(OfferRepository offerRepository, UnsigDetailsRepository unsigDetailsRepository, JacksonJsonParser jsonParser) {
+    public UnsigsServiceImpl(OfferRepository offerRepository, UnsigDetailsRepository unsigDetailsRepository, JacksonJsonParser jsonParser, ObjectMapper objectMapper) {
         this.offerRepository = offerRepository;
         this.unsigDetailsRepository = unsigDetailsRepository;
         this.jsonParser = jsonParser;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -61,7 +69,10 @@ public class UnsigsServiceImpl implements UnsigsService {
         }
 
         MutableList<Object> content = ListIterate.collect(pagedResult.getContent(),
-                e -> UnifiedMap.newWithKeysValues(e.getUnsigId(), jsonParser.parseMap(e.getDetails())));
+                e -> UnifiedMap.newWithKeysValues(
+                        "unisgId", e.getUnsigId(),
+                        "details", jsonParser.parseMap(e.getDetails())
+                ));
         resultMap.put(RESULT_LIST, content);
         resultMap.put(LIST_SIZE, content.size());
         resultMap.put(TOTAL_PAGES, pagedResult.getTotalPages());
@@ -70,9 +81,9 @@ public class UnsigsServiceImpl implements UnsigsService {
     }
 
     @Override
-    public UnsigDetailsEntity getUnsig(String unsigId) {
+    public UnsigDto getUnsig(String unsigId) {
         UnsigDetailsEntity unsigE = unsigDetailsRepository.findByUnsigId(unsigId).orElseThrow();
-        return unsigE;
+        return new UnsigDto(unsigId, jsonParser.parseMap(unsigE.getDetails()));
     }
 
     private Offer buildOfferDto(OfferEntity e) {
@@ -120,5 +131,35 @@ public class UnsigsServiceImpl implements UnsigsService {
             unsigDetailsRepository.saveAll(allToSave);
         }
         return true;
+    }
+
+    @Override
+    public boolean loadMasterData() throws IOException {
+        InputStream resourceAsStream = new ClassPathResource("unsigs-master-data.json").getInputStream();
+        String contentString = new String(resourceAsStream.readAllBytes(), StandardCharsets.UTF_8);
+        Map<String, Object> map = jsonParser.parseMap(contentString);
+
+        List<Map> transactions = (List<Map>) ((Map) map.get("data")).get("transactions");
+        MutableList<Map> allMetadata = ListIterate.flatCollect(transactions, e -> (List) e.get("metadata"));
+        MutableList<Map> allValues = allMetadata.collect(e -> (Map) e.get("value"));
+        MutableList<Map> allUnsigs = (MutableList<Map>) allValues.flatCollect(Map::values);
+
+
+        MutableList<UnsigDetails> resultToStore = allUnsigs.collect(new Function<Map, UnsigDetails>() {
+            @Override
+            public UnsigDetails valueOf(Map m) {
+                String unsigId = (String) m.keySet().iterator().next();
+                UnsigDetails result = new UnsigDetails();
+                result.unsigId = unsigId;
+                try {
+                    result.details = objectMapper.writeValueAsString(m.get(unsigId));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                return result;
+            }
+        });
+
+        return saveUnsigDetails(resultToStore);
     }
 }
