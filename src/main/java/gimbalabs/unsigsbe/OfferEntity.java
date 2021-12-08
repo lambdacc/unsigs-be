@@ -12,7 +12,7 @@ public class OfferEntity {
 
     @Basic(optional = false)
     @Column(name = "unsig_id", unique = true, updatable = false)
-    private Long unsigId;
+    private String unsigId;
 
     @Column(name = "owner")
     private String owner;
@@ -28,11 +28,11 @@ public class OfferEntity {
         this.id = id;
     }
 
-    public Long getUnsigId() {
+    public String getUnsigId() {
         return unsigId;
     }
 
-    public void setUnsigId(Long unsigId) {
+    public void setUnsigId(String unsigId) {
         this.unsigId = unsigId;
     }
 

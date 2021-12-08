@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 public class Offer {
 
     @NotNull(message = "unsigId is required")
-    public Long unsigId;
+    public String unsigId;
     @NotEmpty(message = "owner is required")
     public String owner;
     @NotNull(message = "amount is required")
