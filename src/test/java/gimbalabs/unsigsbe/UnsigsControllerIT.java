@@ -177,10 +177,10 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         assertTrue(l.size() > 0);
 
         Map firstItem = (Map) l.get(0);
-        String key = (String) firstItem.keySet().iterator().next();
+        String idValue = (String) firstItem.get("unsigId");
 
         response = mockMvc.perform(
-                        get("/api/v1/unsigs/{key}".replaceFirst("\\{key\\}", key))
+                        get("/api/v1/unsigs/{id}".replaceFirst("\\{id\\}", idValue))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -191,7 +191,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
 
         rspMap = jsonParser.parseMap(response.getContentAsString());
         String id = (String) rspMap.get("unsigId");
-        assertEquals(id, key);
+        assertEquals(id, idValue);
         Map detailsMap = (Map) rspMap.get("details");
 
 

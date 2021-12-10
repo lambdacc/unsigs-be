@@ -79,15 +79,18 @@
       "resultList" : [ {
         "unsigId" : 2091739706789499382,
         "owner" : "3364e31b-1e40-40a8-b4a2-0201a4c93ecf",
-        "amount" : 10202020
+        "amount" : 10202020,
+        "details" : {... }
       }, {
         "unsigId" : 4016346931292741094,
         "owner" : "b352e3df-c37a-42b3-8f50-33e646f8c66f",
-        "amount" : 10202020
+        "amount" : 10202020,
+        "details" : {... }
       }, {
         "unsigId" : 1070367792716756242,
         "owner" : "0d14176c-06e4-4b17-a1f2-f40a3b7ab271",
-        "amount" : 10202020
+        "amount" : 10202020,
+        "details" : {... }
       } ]
     }
     ----

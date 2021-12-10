@@ -12,6 +12,8 @@ public interface UnsigsService {
 
     UnsigDto getUnsig(String unsigId);
 
+    MutableList<UnsigDto> getUnsigs(MutableList<String> unsigIds);
+
     OfferEntity saveOffer(Offer offer);
 
     boolean saveUnsigDetails(MutableList<UnsigDetails> unsigDetailsList);
