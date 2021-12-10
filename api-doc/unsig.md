@@ -1,8 +1,9 @@
-### Get an unsig by id  
+### Get an unsig by id
 
 - Request
 
 `Endpoint : /api/v1/unsigs`
+
 ```
     [source,http,options="nowrap"]
     ----
@@ -61,6 +62,7 @@
 - Request
 
 `Endpoint : /api/v1/offers`
+
 ```
     [source,http,options="nowrap"]
     ----
@@ -89,7 +91,7 @@
       "totalPages" : 250,
       "listSize" : 10,
       "resultList" : [ {
-        "unisgId" : "unsig09523",
+        "unsigId" : "unsig09523",
         "details" : {
           "files" : [ {
             "src" : "ipfs://QmQHFfDt7cAy2xuFhj85GHuENjb7ZhCQ3avyxuW2bkdBJ7",
@@ -112,7 +114,7 @@
           "source_tx_id" : "e4a90da18935e73f7fd6ffaa688b35b011a1a8a710b47bdb5d7103a05afc0197"
         }
       }, {
-        "unisgId" : "unsig02977",
+        "unsigId" : "unsig02977",
         "details" : {
           "files" : [ {
             "src" : "ipfs://QmPV3tPKTDqJjhm4ir52S5xvgnpECiHrJ8cm9fVX8HSPmC",

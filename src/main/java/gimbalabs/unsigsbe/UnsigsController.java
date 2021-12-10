@@ -3,6 +3,7 @@ package gimbalabs.unsigsbe;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Max;
 import java.io.IOException;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class UnsigsController {
     @GetMapping("/offers")
     public ResponseEntity<Map<String, Object>> listOffers(
             @RequestParam(required = false, defaultValue = "0") Integer pageNo,
-            @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+            @Max(100) @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         return ok(service.listOffers(pageNo, pageSize));
     }
 
@@ -42,14 +43,14 @@ public class UnsigsController {
     @GetMapping("/unsigs")
     public ResponseEntity<Map<String, Object>> listUnsigs(
             @RequestParam(required = false, defaultValue = "0") Integer pageNo,
-            @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+            @Max(100) @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         return ok(service.listUnsigs(pageNo, pageSize));
     }
 
-    @GetMapping("/unsigs/{unsigId}")
-    public ResponseEntity<UnsigDto> listUnsigs(
-            @PathVariable String unsigId) {
-        return ok(service.getUnsig(unsigId));
+    @GetMapping("/unsigs/{id}")
+    public ResponseEntity<UnsigDto> getUnsig(
+            @PathVariable String id) {
+        return ok(service.getUnsig(id));
     }
 
     @PostMapping("/load-data")

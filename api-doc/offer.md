@@ -70,24 +70,58 @@
     Vary: Access-Control-Request-Method
     Vary: Access-Control-Request-Headers
     Content-Type: application/json
-    Content-Length: 469
+    Content-Length: 9099
     
     {
-      "hasNextPage" : false,
-      "totalPages" : 1,
-      "listSize" : 3,
+      "hasNextPage" : true,
+      "totalPages" : 250,
+      "listSize" : 10,
       "resultList" : [ {
-        "unsigId" : 2091739706789499382,
-        "owner" : "3364e31b-1e40-40a8-b4a2-0201a4c93ecf",
-        "amount" : 10202020
+        "unsigId" : "unsig09523",
+        "details" : {
+          "files" : [ {
+            "src" : "ipfs://QmQHFfDt7cAy2xuFhj85GHuENjb7ZhCQ3avyxuW2bkdBJ7",
+            "mediatype" : "image/png"
+          } ],
+          "image" : "ipfs://QmZVfjXKHTiuBPqBdBQyDZU2EbHuGQudD9rcMRdwjqtNN1",
+          "title" : "unsig_09523",
+          "series" : "unsigned_algorithms",
+          "unsigs" : {
+            "index" : 9523,
+            "num_props" : 4,
+            "properties" : {
+              "colors" : [ "Green", "Red", "Blue", "Blue" ],
+              "rotations" : [ "0", "0", "180", "270" ],
+              "multipliers" : [ "1", "2", "4", "4" ],
+              "distributions" : [ "CDF", "CDF", "CDF", "CDF" ]
+            }
+          },
+          "source_key" : [ "721", "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", "unsig00000", "files", "code" ],
+          "source_tx_id" : "e4a90da18935e73f7fd6ffaa688b35b011a1a8a710b47bdb5d7103a05afc0197"
+        }
       }, {
-        "unsigId" : 4016346931292741094,
-        "owner" : "b352e3df-c37a-42b3-8f50-33e646f8c66f",
-        "amount" : 10202020
-      }, {
-        "unsigId" : 1070367792716756242,
-        "owner" : "0d14176c-06e4-4b17-a1f2-f40a3b7ab271",
-        "amount" : 10202020
+        "unsigId" : "unsig02977",
+        "details" : {
+          "files" : [ {
+            "src" : "ipfs://QmPV3tPKTDqJjhm4ir52S5xvgnpECiHrJ8cm9fVX8HSPmC",
+            "mediatype" : "image/png"
+          } ],
+          "image" : "ipfs://QmYoZeL4sV4iKwzUD8ybVQjtedZ5ouQwLjzRxn8k3yedKc",
+          "title" : "unsig_02977",
+          "series" : "unsigned_algorithms",
+          "unsigs" : {
+            "index" : 2977,
+            "num_props" : 4,
+            "properties" : {
+              "colors" : [ "Blue", "Red", "Red", "Green" ],
+              "rotations" : [ "0", "270", "180", "90" ],
+              "multipliers" : [ "0.5", "2", "4", "4" ],
+              "distributions" : [ "CDF", "CDF", "CDF", "CDF" ]
+            }
+          },
+          "source_key" : [ "721", "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", "unsig00000", "files", "code" ],
+          "source_tx_id" : "e4a90da18935e73f7fd6ffaa688b35b011a1a8a710b47bdb5d7103a05afc0197"
+        }
       } ]
     }
     ----

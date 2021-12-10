@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.block.function.Function;
+import org.eclipse.collections.api.block.function.Function2;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.block.factory.Predicates;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.utility.Iterate;
 import org.eclipse.collections.impl.utility.ListIterate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
@@ -22,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static gimbalabs.unsigsbe.Constants.*;
 
@@ -51,9 +53,21 @@ public class UnsigsServiceImpl implements UnsigsService {
             return resultMap;
         }
 
-        List<Offer> content = pagedResult.stream().map(this::buildOfferDto).collect(Collectors.toList());
-        resultMap.put(RESULT_LIST, content);
-        resultMap.put(LIST_SIZE, content.size());
+        List<OfferEntity> content = pagedResult.getContent();
+        MutableList<String> unsigIds = ListIterate.collect(content, e -> e.getUnsigId());
+        MutableList<UnsigDto> unsigDtos = getUnsigs(unsigIds);
+
+        MutableList<OfferDto> resultDtos = ListIterate.collectWith(content, (Function2<OfferEntity, MutableList<UnsigDto>, OfferDto>) (entity, dtos) -> {
+            String id = entity.getUnsigId();
+            UnsigDto d = dtos.detect(Predicates.attributeEqual(UnsigDto::getUnsigId, id));
+            OfferDto offerDto = buildOfferDto(entity);
+            offerDto.setDetails(d != null ? d.getDetails() : UnifiedMap.newMap());
+            return offerDto;
+
+        }, unsigDtos);
+
+        resultMap.put(RESULT_LIST, resultDtos);
+        resultMap.put(LIST_SIZE, resultDtos.size());
         resultMap.put(TOTAL_PAGES, pagedResult.getTotalPages());
         resultMap.put(HAS_NEXT_PAGE, pagedResult.hasNext());
         return resultMap;
@@ -70,7 +84,7 @@ public class UnsigsServiceImpl implements UnsigsService {
 
         MutableList<Object> content = ListIterate.collect(pagedResult.getContent(),
                 e -> UnifiedMap.newWithKeysValues(
-                        "unisgId", e.getUnsigId(),
+                        "unsigId", e.getUnsigId(),
                         "details", jsonParser.parseMap(e.getDetails())
                 ));
         resultMap.put(RESULT_LIST, content);
@@ -86,12 +100,16 @@ public class UnsigsServiceImpl implements UnsigsService {
         return new UnsigDto(unsigId, jsonParser.parseMap(unsigE.getDetails()));
     }
 
-    private Offer buildOfferDto(OfferEntity e) {
-        Offer o = new Offer();
-        o.unsigId = e.getUnsigId();
-        o.owner = e.getOwner();
-        o.amount = e.getAmount();
-        return o;
+    @Override
+    public MutableList<UnsigDto> getUnsigs(MutableList<String> unsigIds) {
+        List<UnsigDetailsEntity> unsigEs = unsigDetailsRepository.findByUnsigIdIn(unsigIds);
+        return ListIterate.collect(unsigEs, e -> new UnsigDto(e.getUnsigId(), jsonParser.parseMap(e.getDetails())));
+    }
+
+    private OfferDto buildOfferDto(OfferEntity e) {
+        OfferDto dto = new OfferDto();
+        BeanUtils.copyProperties(e, dto);
+        return dto;
     }
 
     @Override
