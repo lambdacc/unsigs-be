@@ -151,15 +151,14 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
 
         Map<String, Object> map = jsonParser.parseMap(response.getContentAsString());
         List<Map> resList = (List<Map>) map.get(RESULT_LIST);
-        assertEquals(initialCount +2 ,  resList.size());
+        assertEquals(initialCount + 2, resList.size());
 
 
     }
 
 
-    @Test
-    public void whenLoadMasterData_thenOk() throws Exception {
-        String contentString = Files.readString(Path.of("src/test/resources/allUnsigs.json"));
+    public void whenLoadMasterData_thenOkOld() throws Exception {
+        String contentString = Files.readString(Path.of("src/test/resources/unsigs-test.json"));
         Map<String, Object> map = jsonParser.parseMap(contentString);
         assertFalse(map.isEmpty());
 
@@ -189,6 +188,53 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         boolean b = unsigsService.saveUnsigDetails(resultToStore);
         assertTrue(b);
         assertEquals(allUnsigs.size(), unsigDetailsRepository.count());
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/unsigs")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("{class-name}-{method-name}-list",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
+        Map<String, Object> rspMap = jsonParser.parseMap(response.getContentAsString());
+        List l = (List) rspMap.get(RESULT_LIST);
+        assertTrue(l.size() > 0);
+
+        Map firstItem = (Map) l.get(0);
+        String idValue = (String) firstItem.get("unsigId");
+
+        response = mockMvc.perform(
+                        get("/api/v1/unsigs/{id}".replaceFirst("\\{id\\}", idValue))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("{class-name}-{method-name}-get",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
+        rspMap = jsonParser.parseMap(response.getContentAsString());
+        String id = (String) rspMap.get("unsigId");
+        assertEquals(id, idValue);
+        Map detailsMap = (Map) rspMap.get("details");
+
+
+    }
+
+
+    @Test
+    public void whenLoadMasterData_thenOk() throws Exception {
+        String contentString = Files.readString(Path.of("src/test/resources/unsigs-test.json"));
+        Map<String, Object> map = jsonParser.parseMap(contentString);
+        assertFalse(map.isEmpty());
+        int countUnsigs = map.size();
+
+        boolean b = unsigsService.loadMasterData();
+        assertTrue(b);
+        assertEquals(countUnsigs, unsigDetailsRepository.count());
 
         MockHttpServletResponse response = mockMvc.perform(
                         get("/api/v1/unsigs")

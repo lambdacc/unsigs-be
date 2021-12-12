@@ -5,11 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function2;
+import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.block.factory.Predicates;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.utility.Iterate;
 import org.eclipse.collections.impl.utility.ListIterate;
+import org.eclipse.collections.impl.utility.MapIterate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.core.io.ClassPathResource;
@@ -130,7 +133,7 @@ public class UnsigsServiceImpl implements UnsigsService {
 
     @Override
     public boolean saveUnsigDetails(MutableList<UnsigDetails> unsigDetailsList) {
-        for (RichIterable<UnsigDetails> unsigDetailsChunk : unsigDetailsList.chunk(80)) {
+        for (RichIterable<UnsigDetails> unsigDetailsChunk : unsigDetailsList.chunk(300)) {
             Collection<String> unsigIds = Iterate.collect(unsigDetailsChunk, e -> e.unsigId);
             List<UnsigDetailsEntity> unsigEntitiesInDb = unsigDetailsRepository.findByUnsigIdIn(unsigIds);
 
@@ -151,9 +154,8 @@ public class UnsigsServiceImpl implements UnsigsService {
         return true;
     }
 
-    @Override
-    public boolean loadMasterData() throws IOException {
-        InputStream resourceAsStream = new ClassPathResource("unsigs-master-data.json").getInputStream();
+    public boolean loadMasterDataOld() throws IOException {
+        InputStream resourceAsStream = new ClassPathResource("unsigs-master.json").getInputStream();
         String contentString = new String(resourceAsStream.readAllBytes(), StandardCharsets.UTF_8);
         Map<String, Object> map = jsonParser.parseMap(contentString);
 
@@ -175,6 +177,36 @@ public class UnsigsServiceImpl implements UnsigsService {
                     e.printStackTrace();
                 }
                 return result;
+            }
+        });
+
+        return saveUnsigDetails(resultToStore);
+    }
+
+    @Override
+    public boolean loadMasterData() throws IOException {
+        InputStream resourceAsStream = new ClassPathResource("unsigs-master.json").getInputStream();
+        String contentString = new String(resourceAsStream.readAllBytes(), StandardCharsets.UTF_8);
+        Map<String, Object> map = jsonParser.parseMap(contentString);
+
+        MutableList<UnsigDetails> resultToStore = FastList.newList();
+        MapIterate.forEachKey(map, new Procedure<String>() {
+            @Override
+            public void value(String k) {
+                Map<String, Object> detailsAsMap = (Map<String, Object>) map.get(k);
+                String paddedStr = "00000" + k;
+                String unsigId = paddedStr.substring(paddedStr.length() - 5);
+                detailsAsMap.put("unsigId", unsigId);
+
+                UnsigDetails unsigDetails = new UnsigDetails();
+                unsigDetails.unsigId = unsigId;
+                try {
+                    unsigDetails.details = objectMapper.writeValueAsString(detailsAsMap);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+
+                resultToStore.add(unsigDetails);
             }
         });
 
