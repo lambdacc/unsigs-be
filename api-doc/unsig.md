@@ -2,7 +2,7 @@
 
 - Request
 
-`Endpoint : /api/v1/unsigs`
+`Endpoint : /api/v1/unsigs/{unsigId}`
 
 ```
     [source,http,options="nowrap"]
@@ -26,34 +26,23 @@
     Vary: Access-Control-Request-Method
     Vary: Access-Control-Request-Headers
     Content-Type: application/json
-    Content-Length: 838
+    Content-Length: 248
     
     {
-      "unsigId" : "unsig09523",
+      "unsigId" : "unsig00000",
       "details" : {
-        "files" : [ {
-          "src" : "ipfs://QmQHFfDt7cAy2xuFhj85GHuENjb7ZhCQ3avyxuW2bkdBJ7",
-          "mediatype" : "image/png"
-        } ],
-        "image" : "ipfs://QmZVfjXKHTiuBPqBdBQyDZU2EbHuGQudD9rcMRdwjqtNN1",
-        "title" : "unsig_09523",
-        "series" : "unsigned_algorithms",
-        "unsigs" : {
-          "index" : 9523,
-          "num_props" : 4,
-          "properties" : {
-            "colors" : [ "Green", "Red", "Blue", "Blue" ],
-            "rotations" : [ "0", "0", "180", "270" ],
-            "multipliers" : [ "1", "2", "4", "4" ],
-            "distributions" : [ "CDF", "CDF", "CDF", "CDF" ]
-          }
+        "index" : 0,
+        "num_props" : 0,
+        "properties" : {
+          "multipliers" : [ ],
+          "colors" : [ ],
+          "distributions" : [ ],
+          "rotations" : [ ]
         },
-        "source_key" : [ "721", "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", "unsig00000", "files", "code" ],
-        "source_tx_id" : "e4a90da18935e73f7fd6ffaa688b35b011a1a8a710b47bdb5d7103a05afc0197"
+        "unsigId" : "unsig00000"
       }
     }
     ----
-
 
 ```
 
@@ -61,7 +50,7 @@
 
 - Request
 
-`Endpoint : /api/v1/offers`
+`Endpoint : /api/v1/unsigs`
 
 ```
     [source,http,options="nowrap"]
@@ -77,68 +66,47 @@
 - Response
 
 ```
-    [source,http,options="nowrap"]
+   [source,http,options="nowrap"]
     ----
     HTTP/1.1 200 OK
     Vary: Origin
     Vary: Access-Control-Request-Method
     Vary: Access-Control-Request-Headers
     Content-Type: application/json
-    Content-Length: 9099
+    Content-Length: 3023
     
     {
       "hasNextPage" : true,
-      "totalPages" : 250,
+      "totalPages" : 3112,
       "listSize" : 10,
       "resultList" : [ {
-        "unsigId" : "unsig09523",
+        "unsigId" : "unsig00000",
         "details" : {
-          "files" : [ {
-            "src" : "ipfs://QmQHFfDt7cAy2xuFhj85GHuENjb7ZhCQ3avyxuW2bkdBJ7",
-            "mediatype" : "image/png"
-          } ],
-          "image" : "ipfs://QmZVfjXKHTiuBPqBdBQyDZU2EbHuGQudD9rcMRdwjqtNN1",
-          "title" : "unsig_09523",
-          "series" : "unsigned_algorithms",
-          "unsigs" : {
-            "index" : 9523,
-            "num_props" : 4,
-            "properties" : {
-              "colors" : [ "Green", "Red", "Blue", "Blue" ],
-              "rotations" : [ "0", "0", "180", "270" ],
-              "multipliers" : [ "1", "2", "4", "4" ],
-              "distributions" : [ "CDF", "CDF", "CDF", "CDF" ]
-            }
+          "index" : 0,
+          "num_props" : 0,
+          "properties" : {
+            "multipliers" : [ ],
+            "colors" : [ ],
+            "distributions" : [ ],
+            "rotations" : [ ]
           },
-          "source_key" : [ "721", "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", "unsig00000", "files", "code" ],
-          "source_tx_id" : "e4a90da18935e73f7fd6ffaa688b35b011a1a8a710b47bdb5d7103a05afc0197"
+          "unsigId" : "unsig00000"
         }
       }, {
-        "unsigId" : "unsig02977",
+        "unsigId" : "unsig00009",
         "details" : {
-          "files" : [ {
-            "src" : "ipfs://QmPV3tPKTDqJjhm4ir52S5xvgnpECiHrJ8cm9fVX8HSPmC",
-            "mediatype" : "image/png"
-          } ],
-          "image" : "ipfs://QmYoZeL4sV4iKwzUD8ybVQjtedZ5ouQwLjzRxn8k3yedKc",
-          "title" : "unsig_02977",
-          "series" : "unsigned_algorithms",
-          "unsigs" : {
-            "index" : 2977,
-            "num_props" : 4,
-            "properties" : {
-              "colors" : [ "Blue", "Red", "Red", "Green" ],
-              "rotations" : [ "0", "270", "180", "90" ],
-              "multipliers" : [ "0.5", "2", "4", "4" ],
-              "distributions" : [ "CDF", "CDF", "CDF", "CDF" ]
-            }
+          "index" : 9,
+          "num_props" : 1,
+          "properties" : {
+            "multipliers" : [ 1 ],
+            "colors" : [ "Red" ],
+            "distributions" : [ "CDF" ],
+            "rotations" : [ 0 ]
           },
-          "source_key" : [ "721", "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", "unsig00000", "files", "code" ],
-          "source_tx_id" : "e4a90da18935e73f7fd6ffaa688b35b011a1a8a710b47bdb5d7103a05afc0197"
+          "unsigId" : "unsig00009"
         }
       } ]
     }
     ----
-
 
 ```

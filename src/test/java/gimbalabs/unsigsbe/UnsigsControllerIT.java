@@ -64,9 +64,27 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     }
 
     @Test
-    public void whenCreateNewOffer_thenOk() throws Exception {
+    public void givenNonExistentUnsig_whenCreateOffer_thenNotFound() throws Exception {
 
         Offer o = newOffer(randomId());
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andDo(document("{class-name}-{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+    }
+
+    @Test
+    public void whenCreateNewOffer_thenOk() throws Exception {
+
+        String unsigId = unsigDetailsRepository.findAll(PageRequest.of(10, 10)).getContent().get(6).getUnsigId();
+        Offer o = newOffer(unsigId);
 
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
@@ -157,76 +175,8 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     }
 
 
-    public void whenLoadMasterData_thenOkOld() throws Exception {
-        String contentString = Files.readString(Path.of("src/test/resources/unsigs-test.json"));
-        Map<String, Object> map = jsonParser.parseMap(contentString);
-        assertFalse(map.isEmpty());
-
-        List<Map> transactions = (List<Map>) ((Map) map.get("data")).get("transactions");
-        MutableList<Map> allMetadata = ListIterate.flatCollect(transactions, e -> (List) e.get("metadata"));
-        MutableList<Map> allValues = allMetadata.collect(e -> (Map) e.get("value"));
-        MutableList<Map> allUnsigs = (MutableList<Map>) allValues.flatCollect(Map::values);
-
-        assertFalse(allUnsigs.isEmpty());
-
-        MutableList<UnsigDetails> resultToStore = allUnsigs.collect(new Function<Map, UnsigDetails>() {
-            @Override
-            public UnsigDetails valueOf(Map m) {
-                String unsigId = (String) m.keySet().iterator().next();
-                UnsigDetails result = new UnsigDetails();
-                result.unsigId = unsigId;
-                try {
-                    result.details = objectMapper.writeValueAsString(m.get(unsigId));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-                return result;
-            }
-        });
-
-        assertEquals(allUnsigs.size(), resultToStore.size());
-        boolean b = unsigsService.saveUnsigDetails(resultToStore);
-        assertTrue(b);
-        assertEquals(allUnsigs.size(), unsigDetailsRepository.count());
-
-        MockHttpServletResponse response = mockMvc.perform(
-                        get("/api/v1/unsigs")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andDo(document("{class-name}-{method-name}-list",
-                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
-                .andReturn().getResponse();
-
-        Map<String, Object> rspMap = jsonParser.parseMap(response.getContentAsString());
-        List l = (List) rspMap.get(RESULT_LIST);
-        assertTrue(l.size() > 0);
-
-        Map firstItem = (Map) l.get(0);
-        String idValue = (String) firstItem.get("unsigId");
-
-        response = mockMvc.perform(
-                        get("/api/v1/unsigs/{id}".replaceFirst("\\{id\\}", idValue))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andDo(document("{class-name}-{method-name}-get",
-                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
-                .andReturn().getResponse();
-
-        rspMap = jsonParser.parseMap(response.getContentAsString());
-        String id = (String) rspMap.get("unsigId");
-        assertEquals(id, idValue);
-        Map detailsMap = (Map) rspMap.get("details");
-
-
-    }
-
-
     @Test
-    public void whenLoadMasterData_thenOk() throws Exception {
+    public void givenMasterDataLoaded_whenListOrGet_thenOk() throws Exception {
         String contentString = Files.readString(Path.of("src/test/resources/unsigs-test.json"));
         Map<String, Object> map = jsonParser.parseMap(contentString);
         assertFalse(map.isEmpty());

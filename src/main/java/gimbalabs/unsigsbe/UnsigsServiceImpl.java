@@ -19,7 +19,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,7 +101,8 @@ public class UnsigsServiceImpl implements UnsigsService {
 
     @Override
     public UnsigDto getUnsig(String unsigId) {
-        UnsigDetailsEntity unsigE = unsigDetailsRepository.findByUnsigId(unsigId).orElseThrow();
+        UnsigDetailsEntity unsigE = unsigDetailsRepository.findByUnsigId(unsigId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Given Unsig not found"));
         return new UnsigDto(unsigId, jsonParser.parseMap(unsigE.getDetails()));
     }
 
@@ -117,6 +120,7 @@ public class UnsigsServiceImpl implements UnsigsService {
 
     @Override
     public OfferEntity saveOffer(Offer offer) {
+        unsigDetailsRepository.findByUnsigId(offer.unsigId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Given Unsig not found"));
         Optional<OfferEntity> offerOp = offerRepository.findByUnsigId(offer.unsigId);
         OfferEntity offerE;
         if (offerOp.isPresent()) {
@@ -195,7 +199,7 @@ public class UnsigsServiceImpl implements UnsigsService {
             public void value(String k) {
                 Map<String, Object> detailsAsMap = (Map<String, Object>) map.get(k);
                 String paddedStr = "00000" + k;
-                String unsigId = paddedStr.substring(paddedStr.length() - 5);
+                String unsigId = "unsig"+paddedStr.substring(paddedStr.length() - 5);
                 detailsAsMap.put("unsigId", unsigId);
 
                 UnsigDetails unsigDetails = new UnsigDetails();

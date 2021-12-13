@@ -12,7 +12,18 @@
 			"request": {
 				"url": "http://localhost:8088/api/v1/ping/",
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					}
+				],
 				"body": {},
 				"description": "Ping the server. This just tells you if the server is up."
 			},
@@ -37,7 +48,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": " {\n    \"unsigId\" : 12,\n    \"owner\" : \"2341asd-1e40-40a8-b4a2-0201a4c93ecf\",\n    \"amount\" : 1123456\n    }"
+					"raw": " {\n    \"unsigId\" : \"unsig00112\",\n    \"owner\" : \"2341asd-1e40-40a8-b4a2-0201a4c93ecf\",\n    \"amount\" : 11234567\n    }"
 				},
 				"description": "Create or update offer"
 			},

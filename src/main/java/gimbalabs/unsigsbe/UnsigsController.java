@@ -1,5 +1,6 @@
 package gimbalabs.unsigsbe;
 
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,8 @@ public class UnsigsController {
     }
 
     @GetMapping("/ping")
-    public ResponseEntity<String> ping() {
-        return ok("Hello world");
+    public ResponseEntity<UnifiedMap<String, String>> ping() {
+        return ok(UnifiedMap.newWithKeysValues("response","Hello world"));
     }
 
     @GetMapping("/offers")
