@@ -21,7 +21,12 @@ cd $PROJECT_ROOT_DIR - This is the same directory where pom.xml is.
 4. To ping the server, hit this url.
    `http://localhost:8088/api/v1/ping/`
    Response will be
-   `Hello world`
+   ```
+   {
+   "response": "Hello world"
+   }
+   ```
+   
 
 5. The data related to offers will be stored as a file based db at the mounted location, here it was `~/data` .
 
