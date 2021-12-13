@@ -53,8 +53,6 @@ public class UnsigsServiceIT extends UnsigsBeApplicationTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted())
-                .andDo(document("{class-name}-{method-name}-list",
-                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
                 .andReturn().getResponse();
 
     }

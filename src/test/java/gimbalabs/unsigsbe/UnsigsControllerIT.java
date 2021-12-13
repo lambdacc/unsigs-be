@@ -64,9 +64,27 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     }
 
     @Test
-    public void whenCreateNewOffer_thenOk() throws Exception {
+    public void givenNonExistentUnsig_whenCreateOffer_thenNotFound() throws Exception {
 
         Offer o = newOffer(randomId());
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andDo(document("{class-name}-{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+    }
+
+    @Test
+    public void whenCreateNewOffer_thenOk() throws Exception {
+
+        String unsigId = unsigDetailsRepository.findAll(PageRequest.of(10, 10)).getContent().get(6).getUnsigId();
+        Offer o = newOffer(unsigId);
 
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
@@ -151,44 +169,22 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
 
         Map<String, Object> map = jsonParser.parseMap(response.getContentAsString());
         List<Map> resList = (List<Map>) map.get(RESULT_LIST);
-        assertEquals(initialCount +2 ,  resList.size());
+        assertEquals(initialCount + 2, resList.size());
 
 
     }
 
 
     @Test
-    public void whenLoadMasterData_thenOk() throws Exception {
-        String contentString = Files.readString(Path.of("src/test/resources/allUnsigs.json"));
+    public void givenMasterDataLoaded_whenListOrGet_thenOk() throws Exception {
+        String contentString = Files.readString(Path.of("src/test/resources/unsigs-test.json"));
         Map<String, Object> map = jsonParser.parseMap(contentString);
         assertFalse(map.isEmpty());
+        int countUnsigs = map.size();
 
-        List<Map> transactions = (List<Map>) ((Map) map.get("data")).get("transactions");
-        MutableList<Map> allMetadata = ListIterate.flatCollect(transactions, e -> (List) e.get("metadata"));
-        MutableList<Map> allValues = allMetadata.collect(e -> (Map) e.get("value"));
-        MutableList<Map> allUnsigs = (MutableList<Map>) allValues.flatCollect(Map::values);
-
-        assertFalse(allUnsigs.isEmpty());
-
-        MutableList<UnsigDetails> resultToStore = allUnsigs.collect(new Function<Map, UnsigDetails>() {
-            @Override
-            public UnsigDetails valueOf(Map m) {
-                String unsigId = (String) m.keySet().iterator().next();
-                UnsigDetails result = new UnsigDetails();
-                result.unsigId = unsigId;
-                try {
-                    result.details = objectMapper.writeValueAsString(m.get(unsigId));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-                return result;
-            }
-        });
-
-        assertEquals(allUnsigs.size(), resultToStore.size());
-        boolean b = unsigsService.saveUnsigDetails(resultToStore);
+        boolean b = unsigsService.loadMasterData();
         assertTrue(b);
-        assertEquals(allUnsigs.size(), unsigDetailsRepository.count());
+        assertEquals(countUnsigs, unsigDetailsRepository.count());
 
         MockHttpServletResponse response = mockMvc.perform(
                         get("/api/v1/unsigs")

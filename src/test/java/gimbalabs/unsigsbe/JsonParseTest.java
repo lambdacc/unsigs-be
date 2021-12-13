@@ -18,7 +18,7 @@ public class JsonParseTest extends UnsigsBeApplicationTests {
     @Test
     public void givenUnsigsJsonFile_whenParseIntoMap_thenOk() throws Exception {
 
-        String contentString = Files.readString(Path.of("src/test/resources/allUnsigs.json"));
+        String contentString = Files.readString(Path.of("src/test/resources/unsigs-test.json"));
         Map<String, Object> map = jsonParser.parseMap(contentString);
         assertFalse(map.isEmpty());
     }

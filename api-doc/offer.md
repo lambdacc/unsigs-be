@@ -70,61 +70,43 @@
     Vary: Access-Control-Request-Method
     Vary: Access-Control-Request-Headers
     Content-Type: application/json
-    Content-Length: 9099
+    Content-Length: 856
     
     {
-      "hasNextPage" : true,
-      "totalPages" : 250,
-      "listSize" : 10,
+      "hasNextPage" : false,
+      "totalPages" : 1,
+      "listSize" : 2,
       "resultList" : [ {
-        "unsigId" : "unsig09523",
+        "unsigId" : "unsig00013",
+        "owner" : "1b89ffa6-d241-4c77-9498-9108f6227a48",
+        "amount" : 10202020,
         "details" : {
-          "files" : [ {
-            "src" : "ipfs://QmQHFfDt7cAy2xuFhj85GHuENjb7ZhCQ3avyxuW2bkdBJ7",
-            "mediatype" : "image/png"
-          } ],
-          "image" : "ipfs://QmZVfjXKHTiuBPqBdBQyDZU2EbHuGQudD9rcMRdwjqtNN1",
-          "title" : "unsig_09523",
-          "series" : "unsigned_algorithms",
-          "unsigs" : {
-            "index" : 9523,
-            "num_props" : 4,
-            "properties" : {
-              "colors" : [ "Green", "Red", "Blue", "Blue" ],
-              "rotations" : [ "0", "0", "180", "270" ],
-              "multipliers" : [ "1", "2", "4", "4" ],
-              "distributions" : [ "CDF", "CDF", "CDF", "CDF" ]
-            }
+          "index" : 13,
+          "num_props" : 1,
+          "properties" : {
+            "multipliers" : [ 4 ],
+            "colors" : [ "Blue" ],
+            "distributions" : [ "CDF" ],
+            "rotations" : [ 0 ]
           },
-          "source_key" : [ "721", "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", "unsig00000", "files", "code" ],
-          "source_tx_id" : "e4a90da18935e73f7fd6ffaa688b35b011a1a8a710b47bdb5d7103a05afc0197"
+          "unsigId" : "unsig00013"
         }
       }, {
-        "unsigId" : "unsig02977",
+        "unsigId" : "unsig00016",
+        "owner" : "b2120150-8a45-4437-bfac-4a0da37f113c",
+        "amount" : 10202020,
         "details" : {
-          "files" : [ {
-            "src" : "ipfs://QmPV3tPKTDqJjhm4ir52S5xvgnpECiHrJ8cm9fVX8HSPmC",
-            "mediatype" : "image/png"
-          } ],
-          "image" : "ipfs://QmYoZeL4sV4iKwzUD8ybVQjtedZ5ouQwLjzRxn8k3yedKc",
-          "title" : "unsig_02977",
-          "series" : "unsigned_algorithms",
-          "unsigs" : {
-            "index" : 2977,
-            "num_props" : 4,
-            "properties" : {
-              "colors" : [ "Blue", "Red", "Red", "Green" ],
-              "rotations" : [ "0", "270", "180", "90" ],
-              "multipliers" : [ "0.5", "2", "4", "4" ],
-              "distributions" : [ "CDF", "CDF", "CDF", "CDF" ]
-            }
+          "index" : 16,
+          "num_props" : 2,
+          "properties" : {
+            "multipliers" : [ 0.5, 1 ],
+            "colors" : [ "Blue", "Green" ],
+            "distributions" : [ "CDF", "CDF" ],
+            "rotations" : [ 0, 0 ]
           },
-          "source_key" : [ "721", "0e14267a8020229adc0184dd25fa3174c3f7d6caadcb4425c70e7c04", "unsig00000", "files", "code" ],
-          "source_tx_id" : "e4a90da18935e73f7fd6ffaa688b35b011a1a8a710b47bdb5d7103a05afc0197"
+          "unsigId" : "unsig00016"
         }
       } ]
     }
     ----
-
-
 ```
