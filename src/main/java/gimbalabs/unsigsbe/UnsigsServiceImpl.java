@@ -215,7 +215,7 @@ public class UnsigsServiceImpl implements UnsigsService {
                 resultToStore.add(unsigDetails);
             }
         });
-
+        unsigDetailsRepository.deleteAll();
         return saveUnsigDetails(resultToStore);
     }
 }
