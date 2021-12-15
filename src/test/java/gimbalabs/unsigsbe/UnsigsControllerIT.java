@@ -66,7 +66,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     @Test
     public void givenNonExistentUnsig_whenCreateOffer_thenNotFound() throws Exception {
 
-        Offer o = newOffer(randomId());
+        Offer o = newOffer(randomId(),1020L);
 
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
@@ -84,7 +84,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     public void whenCreateNewOffer_thenOk() throws Exception {
 
         String unsigId = unsigDetailsRepository.findAll(PageRequest.of(10, 10)).getContent().get(6).getUnsigId();
-        Offer o = newOffer(unsigId);
+        Offer o = newOffer(unsigId,1020L);
 
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
@@ -102,11 +102,11 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         return String.valueOf(Math.abs(new Random().nextLong()));
     }
 
-    private Offer newOffer(String unsigId) {
+    private Offer newOffer(String unsigId, Long amount) {
         Offer o = new Offer();
         o.unsigId = unsigId;
         o.owner = UUID.randomUUID().toString();
-        o.amount = 10202020L;
+        o.amount = amount;
         return o;
     }
 
@@ -123,8 +123,9 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         assertNotNull(item2);
 
         long initialCount = offerRepository.count();
+        assertEquals(0, initialCount);
 
-        Offer o = newOffer(item1.getUnsigId());
+        Offer o = newOffer(item1.getUnsigId(), 1020L);
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -132,7 +133,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                                 .content(asJsonString(o)))
                 .andExpect(status().isAccepted())
                 .andReturn().getResponse();
-        o = newOffer(item2.getUnsigId());
+        o = newOffer(item2.getUnsigId(), 1020L);
         response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +146,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         assertEquals(initialCount + 2, newCount0);
 
         //update existing - count does not change
-        o = newOffer(item2.getUnsigId());
+        o = newOffer(item2.getUnsigId(),8888L);
         response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -171,6 +172,34 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         List<Map> resList = (List<Map>) map.get(RESULT_LIST);
         assertEquals(initialCount + 2, resList.size());
 
+        //order check - default desc
+        Long firstVal = Long.valueOf((Integer) resList.get(0).get("amount"));
+        Long secondVal = Long.valueOf((Integer) resList.get(1).get("amount"));
+        assertEquals(1020L, secondVal);
+        assertEquals(8888L,firstVal);
+
+
+        response = mockMvc.perform(
+                        get("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .param("order","A")
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("{class-name}-{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
+        map = jsonParser.parseMap(response.getContentAsString());
+        resList = (List<Map>) map.get(RESULT_LIST);
+        assertEquals(initialCount + 2, resList.size());
+
+        //now order is asc
+        firstVal = Long.valueOf((Integer) resList.get(0).get("amount"));
+        secondVal = Long.valueOf((Integer) resList.get(1).get("amount"));
+        assertEquals(1020L, firstVal);
+        assertEquals(8888L,secondVal);
 
     }
 

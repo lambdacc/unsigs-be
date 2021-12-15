@@ -30,8 +30,9 @@ public class UnsigsController {
     @GetMapping("/offers")
     public ResponseEntity<Map<String, Object>> listOffers(
             @RequestParam(required = false, defaultValue = "0") Integer pageNo,
-            @Max(100) @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
-        return ok(service.listOffers(pageNo, pageSize));
+            @Max(100) @RequestParam(required = false, defaultValue = "10") Integer pageSize,
+            @RequestParam (defaultValue = "D") String order) {
+        return ok(service.listOffers(pageNo, pageSize, order));
     }
 
     @PutMapping("/offers")

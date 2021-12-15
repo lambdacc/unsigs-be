@@ -115,10 +115,10 @@
 			"response": []
 		},
 		{
-			"name": "List offers with  page number and size params",
+			"name": "List offers with params",
 			"request": {
 				"url": {
-					"raw": "http://localhost:8088/api/v1/offers?pageNo=2&pageSize=5",
+					"raw": "http://localhost:8088/api/v1/offers?pageNo=0&pageSize=5&order=A",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -132,13 +132,19 @@
 					"query": [
 						{
 							"key": "pageNo",
-							"value": "2",
+							"value": "0",
 							"equals": true,
 							"description": ""
 						},
 						{
 							"key": "pageSize",
 							"value": "5",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "order",
+							"value": "A",
 							"equals": true,
 							"description": ""
 						}
