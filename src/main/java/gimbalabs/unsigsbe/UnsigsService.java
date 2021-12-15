@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public interface UnsigsService {
-    Map<String, Object> listOffers(Integer pageNo, Integer pageSize);
+    Map<String, Object> listOffers(Integer pageNo, Integer pageSize, String order);
 
     Map<String, Object> listUnsigs(Integer pageNo, Integer pageSize);
 

@@ -19,6 +19,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -50,8 +51,9 @@ public class UnsigsServiceImpl implements UnsigsService {
     }
 
     @Override
-    public Map<String, Object> listOffers(Integer pageNo, Integer pageSize) {
-        Pageable paging = PageRequest.of(pageNo, pageSize);
+    public Map<String, Object> listOffers(Integer pageNo, Integer pageSize, String order) {
+        Sort sortBy = "A".equals(order) ? Sort.by(Sort.Direction.ASC, "amount") : Sort.by(Sort.Direction.DESC, "amount");
+        Pageable paging = PageRequest.of(pageNo, pageSize, sortBy);
         Page<OfferEntity> pagedResult = offerRepository.findAll(paging);
         Map<String, Object> resultMap = Util.newPagedResponseMap();
         if (pagedResult.isEmpty()) {
