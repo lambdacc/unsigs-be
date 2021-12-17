@@ -110,3 +110,45 @@
     }
     ----
 ```
+
+
+### Delete an offer
+
+- Request
+
+`Endpoint : /api/v1/offers`
+```
+    [source,http,options="nowrap"]
+    ----
+    DELETE /api/v1/offers HTTP/1.1
+    Content-Type: application/json
+    Accept: application/json
+    Content-Length: 102
+    Host: localhost:8080
+    
+    {
+      "unsigId" : "unsig00101",
+      "owner" : "8830eabd-bd42-494a-a5d5-a091602a95ae",
+      "amount" : 45678
+    }
+    ----
+
+```
+
+- Response
+
+```
+   [source,http,options="nowrap"]
+    ----
+    HTTP/1.1 202 Accepted
+    Vary: Origin
+    Vary: Access-Control-Request-Method
+    Vary: Access-Control-Request-Headers
+    Content-Type: application/json
+    Content-Length: 30
+    
+    {
+      "unsigId" : "unsig00101"
+    }
+    ----
+```

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.ResponseEntity.*;
@@ -24,14 +25,14 @@ public class UnsigsController {
 
     @GetMapping("/ping")
     public ResponseEntity<UnifiedMap<String, String>> ping() {
-        return ok(UnifiedMap.newWithKeysValues("response","Hello world"));
+        return ok(UnifiedMap.newWithKeysValues("response", "Hello world"));
     }
 
     @GetMapping("/offers")
     public ResponseEntity<Map<String, Object>> listOffers(
             @RequestParam(required = false, defaultValue = "0") Integer pageNo,
             @Max(100) @RequestParam(required = false, defaultValue = "10") Integer pageSize,
-            @RequestParam (defaultValue = "D") String order) {
+            @RequestParam(defaultValue = "D") String order) {
         return ok(service.listOffers(pageNo, pageSize, order));
     }
 
@@ -42,11 +43,30 @@ public class UnsigsController {
         return accepted().body(service.saveOffer(offer));
     }
 
+    @DeleteMapping("/offers")
+    public ResponseEntity<Map<String, String>> deleteOffer(
+            @RequestBody Offer offer) {
+
+        String unsigId = service.deleteOffer(offer);
+        return accepted()
+                .body(UnifiedMap.newWithKeysValues("unsigId", unsigId));
+    }
+
     @GetMapping("/unsigs")
     public ResponseEntity<Map<String, Object>> listUnsigs(
             @RequestParam(required = false, defaultValue = "0") Integer pageNo,
             @Max(100) @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         return ok(service.listUnsigs(pageNo, pageSize));
+    }
+
+    @PostMapping("/unsigs/find")
+    public ResponseEntity<Map<String, Object>> findUnsigsByIds(
+            @RequestBody(required = true) List<String> unsigIds) {
+
+        if (unsigIds.size() > 30) {
+            throw new RuntimeException("Requested content size above limit");
+        }
+        return ok(service.findUnsigsByIds(unsigIds));
     }
 
     @GetMapping("/unsigs/{id}")
