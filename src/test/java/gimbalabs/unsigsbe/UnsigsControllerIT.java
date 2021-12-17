@@ -1,7 +1,5 @@
 package gimbalabs.unsigsbe;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.utility.ListIterate;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -31,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,15 +39,13 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
 
     @Autowired
     OfferRepository offerRepository;
+    @Autowired
+    UnsigsService unsigsService;
+    @Autowired
+    UnsigDetailsRepository unsigDetailsRepository;
     private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext context;
-
-    @Autowired
-    UnsigsService unsigsService;
-
-    @Autowired
-    UnsigDetailsRepository unsigDetailsRepository;
 
     @BeforeEach
     public void setup(RestDocumentationContextProvider restDocumentation) {
@@ -66,7 +62,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     @Test
     public void givenNonExistentUnsig_whenCreateOffer_thenNotFound() throws Exception {
 
-        Offer o = newOffer(randomId(),1020L);
+        Offer o = newOffer(randomId(), 1020L);
 
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
@@ -84,7 +80,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     public void whenCreateNewOffer_thenOk() throws Exception {
 
         String unsigId = unsigDetailsRepository.findAll(PageRequest.of(10, 10)).getContent().get(6).getUnsigId();
-        Offer o = newOffer(unsigId,1020L);
+        Offer o = newOffer(unsigId, 1020L);
 
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
@@ -96,6 +92,81 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                 .andDo(document("{class-name}-{method-name}",
                         preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
                 .andReturn().getResponse();
+    }
+
+    @Test
+    public void whenDeleteOffer_thenOk() throws Exception {
+
+        String unsigId = unsigDetailsRepository.findAll(PageRequest.of(10, 10)).getContent().get(1).getUnsigId();
+        long amt = 45678L;
+        Offer o = newOffer(unsigId, amt);
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andDo(print())
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse();
+
+        OfferEntity byUnsigId = offerRepository.findByUnsigId(unsigId).orElseThrow();
+        assertNotNull(byUnsigId);
+        assertEquals(amt, byUnsigId.getAmount());
+
+
+        response = mockMvc.perform(
+                        delete("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andDo(print())
+                .andExpect(status().isAccepted())
+                .andDo(document("{class-name}-{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
+        Map<String, Object> map = jsonParser.parseMap(response.getContentAsString());
+        assertEquals(unsigId, map.get("unsigId"));
+
+
+        Optional<OfferEntity> unsigOp = offerRepository.findByUnsigId(unsigId);
+        assertTrue(unsigOp.isEmpty());
+    }
+
+    @Test
+    public void givenPropertiesNotMatch_whenDeleteOffer_thenForbidden() throws Exception {
+
+        String unsigId = unsigDetailsRepository.findAll(PageRequest.of(10, 10)).getContent().get(1).getUnsigId();
+        long amt = 45678L;
+        Offer o = newOffer(unsigId, amt);
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andDo(print())
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse();
+
+        OfferEntity byUnsigId = offerRepository.findByUnsigId(unsigId).orElseThrow();
+        assertNotNull(byUnsigId);
+        assertEquals(amt, byUnsigId.getAmount());
+
+
+        o.owner = UUID.randomUUID().toString();
+        response = mockMvc.perform(
+                        delete("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andDo(document("{class-name}-{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
     }
 
     private String randomId() {
@@ -146,7 +217,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         assertEquals(initialCount + 2, newCount0);
 
         //update existing - count does not change
-        o = newOffer(item2.getUnsigId(),8888L);
+        o = newOffer(item2.getUnsigId(), 8888L);
         response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -176,14 +247,14 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         Long firstVal = Long.valueOf((Integer) resList.get(0).get("amount"));
         Long secondVal = Long.valueOf((Integer) resList.get(1).get("amount"));
         assertEquals(1020L, secondVal);
-        assertEquals(8888L,firstVal);
+        assertEquals(8888L, firstVal);
 
 
         response = mockMvc.perform(
                         get("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .param("order","A")
+                                .param("order", "A")
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -199,10 +270,9 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         firstVal = Long.valueOf((Integer) resList.get(0).get("amount"));
         secondVal = Long.valueOf((Integer) resList.get(1).get("amount"));
         assertEquals(1020L, firstVal);
-        assertEquals(8888L,secondVal);
+        assertEquals(8888L, secondVal);
 
     }
-
 
     @Test
     public void givenMasterDataLoaded_whenListOrGet_thenOk() throws Exception {
@@ -248,6 +318,53 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         Map detailsMap = (Map) rspMap.get("details");
 
 
+    }
+
+    @Test
+    public void givenMasterDataLoaded_whenFindByUnsigIds_thenOk() throws Exception {
+
+        long count = unsigDetailsRepository.count();
+        if (count < 100) {
+            loadUnsigMasterData();
+        }
+
+        Page<UnsigDetailsEntity> set1 = unsigDetailsRepository.findAll(PageRequest.of(2, 15));
+        Page<UnsigDetailsEntity> set2 = unsigDetailsRepository.findAll(PageRequest.of(6, 10));
+
+        MutableList<String> usIds = ListIterate.collect(set1.getContent(), e -> e.getUnsigId());
+        usIds.addAll(ListIterate.collect(set2.getContent(), e -> e.getUnsigId()));
+
+        assertEquals(25, usIds.size());
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        post("/api/v1/unsigs/find")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(usIds))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("{class-name}-{method-name}-find",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
+        Map<String, Object> rspMap = jsonParser.parseMap(response.getContentAsString());
+        List<Map> l = (List) rspMap.get(RESULT_LIST);
+        assertEquals(25, l.size());
+
+        MutableList<Object> rspIds = ListIterate.collect(l, e -> e.get("unsigId"));
+        assertTrue(rspIds.allSatisfy(e -> usIds.contains(e)));
+    }
+
+    private void loadUnsigMasterData() throws IOException {
+        String contentString = Files.readString(Path.of("src/test/resources/unsigs-test.json"));
+        Map<String, Object> map = jsonParser.parseMap(contentString);
+        assertFalse(map.isEmpty());
+        int countUnsigs = map.size();
+
+        boolean b = unsigsService.loadMasterData();
+        assertTrue(b);
+        assertEquals(countUnsigs, unsigDetailsRepository.count());
     }
 
 

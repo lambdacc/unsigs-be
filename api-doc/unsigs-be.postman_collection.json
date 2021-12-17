@@ -48,7 +48,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": " {\n    \"unsigId\" : \"unsig00112\",\n    \"owner\" : \"2341asd-1e40-40a8-b4a2-0201a4c93ecf\",\n    \"amount\" : 11234567\n    }"
+					"raw": " {\n    \"unsigId\" : \"unsig00100\",\n    \"owner\" : \"2341asd-1e40-40a8-b4a2-0201a4c93ecf\",\n    \"amount\" : 999\n    }"
 				},
 				"description": "Create or update offer"
 			},
@@ -66,10 +66,35 @@
 			"response": []
 		},
 		{
+			"name": "Delete offers",
+			"request": {
+				"url": "http://localhost:8088/api/v1/offers",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n    \"unsigId\" : \"unsig00100\",\n    \"owner\" : \"2341asd-1e40-40a8-b4a2-0201a4c93ecf\",\n    \"amount\" : 999\n    }"
+				},
+				"description": "Paginated listing of latest offers"
+			},
+			"response": []
+		},
+		{
 			"name": "List unsigs",
 			"request": {
 				"url": {
-					"raw": "http://localhost:8088/api/v1/unsigs?pageNo=2&pageSize=10",
+					"raw": "http://localhost:8088/api/v1/unsigs?pageNo=0&pageSize=10",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -83,7 +108,7 @@
 					"query": [
 						{
 							"key": "pageNo",
-							"value": "2",
+							"value": "0",
 							"equals": true,
 							"description": ""
 						},

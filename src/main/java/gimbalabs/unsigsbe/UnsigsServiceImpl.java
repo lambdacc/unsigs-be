@@ -2,6 +2,7 @@ package gimbalabs.unsigsbe;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gimbalabs.unsigsbe.exception.ApiException;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function2;
@@ -104,7 +105,7 @@ public class UnsigsServiceImpl implements UnsigsService {
     @Override
     public UnsigDto getUnsig(String unsigId) {
         UnsigDetailsEntity unsigE = unsigDetailsRepository.findByUnsigId(unsigId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Given Unsig not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Given Unsig not found"));
         return new UnsigDto(unsigId, jsonParser.parseMap(unsigE.getDetails()));
     }
 
@@ -122,7 +123,7 @@ public class UnsigsServiceImpl implements UnsigsService {
 
     @Override
     public OfferEntity saveOffer(Offer offer) {
-        unsigDetailsRepository.findByUnsigId(offer.unsigId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Given Unsig not found"));
+        unsigDetailsRepository.findByUnsigId(offer.unsigId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Given Unsig not found"));
         Optional<OfferEntity> offerOp = offerRepository.findByUnsigId(offer.unsigId);
         OfferEntity offerE;
         if (offerOp.isPresent()) {
@@ -135,6 +136,19 @@ public class UnsigsServiceImpl implements UnsigsService {
         offerE.setAmount(offer.amount);
 
         return offerRepository.save(offerE);
+    }
+
+    @Override
+    public String deleteOffer(Offer offer) {
+        unsigDetailsRepository.findByUnsigId(offer.unsigId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Given Unsig not found"));
+        OfferEntity o = offerRepository.findByUnsigId(offer.unsigId).orElseThrow();
+
+        boolean propsMatch = offer.amount.equals(o.getAmount()) && offer.owner.equals(o.getOwner());
+        if (!propsMatch) {
+            throw new ApiException("Action not permitted", HttpStatus.FORBIDDEN);
+        }
+        offerRepository.delete(o);
+        return offer.unsigId;
     }
 
     @Override
@@ -201,7 +215,7 @@ public class UnsigsServiceImpl implements UnsigsService {
             public void value(String k) {
                 Map<String, Object> detailsAsMap = (Map<String, Object>) map.get(k);
                 String paddedStr = "00000" + k;
-                String unsigId = "unsig"+paddedStr.substring(paddedStr.length() - 5);
+                String unsigId = "unsig" + paddedStr.substring(paddedStr.length() - 5);
                 detailsAsMap.put("unsigId", unsigId);
 
                 UnsigDetails unsigDetails = new UnsigDetails();
@@ -217,5 +231,26 @@ public class UnsigsServiceImpl implements UnsigsService {
         });
         unsigDetailsRepository.deleteAll();
         return saveUnsigDetails(resultToStore);
+    }
+
+    @Override
+    public Map<String, Object> findUnsigsByIds(List<String> unsigIds) {
+        MutableList<String> filteredUnsigIds = ListIterate.select(unsigIds, Predicates.notNull());
+        List<UnsigDetailsEntity> result = unsigDetailsRepository.findByUnsigIdIn(filteredUnsigIds);
+        Map<String, Object> resultMap = Util.newPagedResponseMap();
+        if (result.isEmpty()) {
+            return resultMap;
+        }
+
+        MutableList<Object> content = ListIterate.collect(result,
+                e -> UnifiedMap.newWithKeysValues(
+                        "unsigId", e.getUnsigId(),
+                        "details", jsonParser.parseMap(e.getDetails())
+                ));
+        resultMap.put(RESULT_LIST, content);
+        resultMap.put(LIST_SIZE, content.size());
+        resultMap.put(TOTAL_PAGES, 1);
+        resultMap.put(HAS_NEXT_PAGE, false);
+        return resultMap;
     }
 }
