@@ -16,7 +16,7 @@ cd $PROJECT_ROOT_DIR - This is the same directory where pom.xml is.
 
 3. Run the docker image
 
-   `sudo docker run -p 8088:8088 --name unsigs-be -v ~/data:/data unsigs-be:0.2`
+   `sudo docker run -p 8088:8088 --name unsigs-be -v ~/data:/data -v ~/logs:/logs unsigs-be:0.2`
 
 4. To ping the server, hit this url.
    `http://localhost:8088/api/v1/ping/`
