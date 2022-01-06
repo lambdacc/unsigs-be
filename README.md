@@ -1,4 +1,4 @@
-### Running the server with docker
+    ### Running the server with docker
 
 cd $PROJECT_ROOT_DIR - This is the same directory where pom.xml is.
 
@@ -33,3 +33,13 @@ cd $PROJECT_ROOT_DIR - This is the same directory where pom.xml is.
 5. The data related to offers will be stored as a file based db at the mounted location, here it was `~/data` .
 
 6. Under the `api-doc` directory, you will find api documentation and sample Postman collection
+
+
+
+#### Useful docker commands
+
+Remove dangling images:
+`sudo docker rmi $(sudo docker images --filter "dangling=true" -q --no-trunc)`
+
+Remove all stopped containers
+`sudo docker rm $(sudo docker ps --filter status=exited -q)`
