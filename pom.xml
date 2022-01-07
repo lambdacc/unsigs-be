@@ -10,7 +10,7 @@
     </parent>
     <groupId>gimbalabs</groupId>
     <artifactId>unsigs-be</artifactId>
-    <version>0.2</version>
+    <version>1.0-RC</version>
     <name>unsigs-be</name>
     <description>unsigs-be</description>
     <properties>
@@ -58,7 +58,11 @@
             <artifactId>spring-restdocs-mockmvc</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>

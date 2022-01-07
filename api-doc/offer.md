@@ -9,16 +9,17 @@
     PUT /api/v1/offers HTTP/1.1
     Content-Type: application/json
     Accept: application/json
-    Content-Length: 116
+    Content-Length: 180
     Host: localhost:8080
     
     {
-    "unsigId" : 2091739706789499382,
-    "owner" : "3364e31b-1e40-40a8-b4a2-0201a4c93ecf",
-    "amount" : 10202020
+      "unsigId" : "unsig00106",
+      "owner" : "c2542684-b519-4b45-a8cf-0d9ed939ad10",
+      "amount" : 1020,
+      "txHash" : "5c988a44-9a84-4e45-bb64-a5353dd8aacb",
+      "txIndex" : 2018366034
     }
     ----
-
 ```
 
 - Response
@@ -31,13 +32,15 @@
     Vary: Access-Control-Request-Method
     Vary: Access-Control-Request-Headers
     Content-Type: application/json
-    Content-Length: 129
+    Content-Length: 196
     
     {
-      "id" : 1,
-      "unsigId" : 2091739706789499382,
-      "owner" : "3364e31b-1e40-40a8-b4a2-0201a4c93ecf",
-      "amount" : 10202020
+      "id" : 62241,
+      "unsigId" : "unsig00106",
+      "owner" : "c2542684-b519-4b45-a8cf-0d9ed939ad10",
+      "amount" : 1020,
+      "txHash" : "5c988a44-9a84-4e45-bb64-a5353dd8aacb",
+      "txIndex" : 2018366034
     }
     ----
 
@@ -70,41 +73,45 @@
     Vary: Access-Control-Request-Method
     Vary: Access-Control-Request-Headers
     Content-Type: application/json
-    Content-Length: 856
+    Content-Length: 988
     
     {
       "hasNextPage" : false,
       "totalPages" : 1,
       "listSize" : 2,
       "resultList" : [ {
-        "unsigId" : "unsig00013",
-        "owner" : "1b89ffa6-d241-4c77-9498-9108f6227a48",
-        "amount" : 10202020,
+        "unsigId" : "unsig00010",
+        "owner" : "9073127f-875c-4b1e-86b1-617ed54fba2c",
+        "amount" : 1020,
+        "txHash" : "6bb6ae9d-e933-4227-b906-7c485140aa8b",
+        "txIndex" : 1828177559,
         "details" : {
-          "index" : 13,
+          "index" : 10,
           "num_props" : 1,
           "properties" : {
-            "multipliers" : [ 4 ],
+            "multipliers" : [ 2 ],
             "colors" : [ "Blue" ],
             "distributions" : [ "CDF" ],
             "rotations" : [ 0 ]
           },
-          "unsigId" : "unsig00013"
+          "unsigId" : "unsig00010"
         }
       }, {
-        "unsigId" : "unsig00016",
-        "owner" : "b2120150-8a45-4437-bfac-4a0da37f113c",
-        "amount" : 10202020,
+        "unsigId" : "unsig00012",
+        "owner" : "38e5b335-b4c3-44fb-adb4-f0a912ed4dd0",
+        "amount" : 8888,
+        "txHash" : "40f1fbff-d3f8-4f7d-a236-337ab509eb1e",
+        "txIndex" : 937212804,
         "details" : {
-          "index" : 16,
-          "num_props" : 2,
+          "index" : 12,
+          "num_props" : 1,
           "properties" : {
-            "multipliers" : [ 0.5, 1 ],
-            "colors" : [ "Blue", "Green" ],
-            "distributions" : [ "CDF", "CDF" ],
-            "rotations" : [ 0, 0 ]
+            "multipliers" : [ 2 ],
+            "colors" : [ "Red" ],
+            "distributions" : [ "CDF" ],
+            "rotations" : [ 0 ]
           },
-          "unsigId" : "unsig00016"
+          "unsigId" : "unsig00012"
         }
       } ]
     }

@@ -1,5 +1,10 @@
 package gimbalabs.unsigsbe;
 
+import gimbalabs.unsigsbe.dto.UnsigDto;
+import gimbalabs.unsigsbe.entity.OfferEntity;
+import gimbalabs.unsigsbe.model.AssetTransaction;
+import gimbalabs.unsigsbe.model.Offer;
+import lombok.AllArgsConstructor;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +20,11 @@ import static org.springframework.http.ResponseEntity.*;
 @RequestMapping(path = "/api/v1",
         produces = "application/json")
 @CrossOrigin(origins = "*")
+@AllArgsConstructor
 public class UnsigsController {
 
     private final UnsigsService service;
-
-    public UnsigsController(UnsigsService service) {
-        this.service = service;
-    }
+    private final BlockfrostAdapter blockfrostAdapter;
 
     @GetMapping("/ping")
     public ResponseEntity<UnifiedMap<String, String>> ping() {
@@ -83,6 +86,13 @@ public class UnsigsController {
             e.printStackTrace();
         }
         return internalServerError().body(false);
+    }
+
+    @GetMapping("/last-transaction/{asset}")
+    public ResponseEntity<AssetTransaction> getLastAssetTransaction(
+            @PathVariable String asset) throws Exception {
+
+        return ok(blockfrostAdapter.getLatestAssetTransaction(asset));
     }
 
 }

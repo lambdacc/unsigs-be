@@ -1,5 +1,9 @@
 package gimbalabs.unsigsbe;
 
+import gimbalabs.unsigsbe.dto.UnsigDto;
+import gimbalabs.unsigsbe.entity.OfferEntity;
+import gimbalabs.unsigsbe.model.Offer;
+import gimbalabs.unsigsbe.model.UnsigDetails;
 import org.eclipse.collections.api.list.MutableList;
 
 import javax.validation.constraints.NotNull;
