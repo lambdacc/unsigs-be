@@ -12,6 +12,7 @@ public class Offer {
     @NotNull(message = "amount is required")
     public Long amount;
     public String txHash;
+    public String datumHash;
     public Integer txIndex;
 
 }
