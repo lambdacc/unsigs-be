@@ -7,7 +7,7 @@
 ```
     [source,http,options="nowrap"]
     ----
-    GET /api/v1/unsigs/unsig00000 HTTP/1.1
+    GET /api/v1/unsigs/unsig00017 HTTP/1.1
     Content-Type: application/json
     Accept: application/json
     Host: localhost:8080
@@ -26,22 +26,29 @@
     Vary: Access-Control-Request-Method
     Vary: Access-Control-Request-Headers
     Content-Type: application/json
-    Content-Length: 273
+    Content-Length: 561
     
     {
-      "unsigId" : "unsig00000",
+      "unsigId" : "unsig00017",
       "details" : {
-        "index" : 0,
-        "num_props" : 0,
+        "index" : 17,
+        "num_props" : 2,
         "properties" : {
-          "multipliers" : [ ],
-          "colors" : [ ],
-          "distributions" : [ ],
-          "rotations" : [ ]
+          "multipliers" : [ 0.5, 1 ],
+          "colors" : [ "Blue", "Green" ],
+          "distributions" : [ "CDF", "CDF" ],
+          "rotations" : [ 0, 90 ]
         },
-        "unsigId" : "unsig00000"
+        "unsigId" : "unsig00017"
       },
-      "offerDetails" : null
+      "offerDetails" : {
+        "txHash" : "0090b5a6-c5b1-4844-adb9-77c67253cf33",
+        "txIndex" : 429128962,
+        "datumHash" : "b995057a-8c02-4e3c-86f1-53761c97e204",
+        "unsigId" : "unsig00017",
+        "owner" : "6b1503cd-59b9-4aa6-aa60-12626172b1aa",
+        "amount" : 1020
+      }
     }
     ----
 

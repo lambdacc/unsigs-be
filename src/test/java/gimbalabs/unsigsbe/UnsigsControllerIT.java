@@ -184,6 +184,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         o.amount = amount;
         o.txHash = UUID.randomUUID().toString();
         o.txIndex = Math.abs(new Random().nextInt());
+        o.datumHash = UUID.randomUUID().toString();
         return o;
     }
 
@@ -281,7 +282,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     }
 
     @Test
-    public void whenCreateAndGetOffers_thenContainsOfferDetails() throws Exception {
+    public void whenCreateAndGetUnsigDetailsById_thenContainsOfferDetails() throws Exception {
         offerRepository.deleteAll();
         Page<UnsigDetailsEntity> firstTen = unsigDetailsRepository.findAll(PageRequest.of(1, 10));
         List<UnsigDetailsEntity> content = new ArrayList(firstTen.getContent());
@@ -300,6 +301,8 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                                 .accept(MediaType.APPLICATION_JSON)
                                 .content(asJsonString(o)))
                 .andExpect(status().isAccepted())
+                .andDo(document("{class-name}-{method-name}-create",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
                 .andReturn().getResponse();
 
         long newCount0 = offerRepository.count();
@@ -311,7 +314,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(document("{class-name}-{method-name}",
+                .andDo(document("{class-name}-{method-name}-get",
                         preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
                 .andReturn().getResponse();
 
@@ -321,6 +324,9 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         assertEquals(unsigId, offerDetailsMap.get("unsigId"));
         assertEquals(o.owner, offerDetailsMap.get("owner"));
         assertEquals(o.amount, Long.valueOf((Integer) offerDetailsMap.get("amount")));
+        assertEquals(o.txHash, offerDetailsMap.get("txHash"));
+        assertEquals(o.txIndex, offerDetailsMap.get("txIndex"));
+        assertEquals(o.datumHash, offerDetailsMap.get("datumHash"));
     }
 
     @Test

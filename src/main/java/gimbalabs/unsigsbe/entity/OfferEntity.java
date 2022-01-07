@@ -26,6 +26,9 @@ public class OfferEntity {
     @Column(name = "tx_hash")
     private String txHash;
 
+    @Column(name = "datum_hash")
+    private String datumHash;
+
     @Column(name = "tx_index")
     private Integer txIndex;
 

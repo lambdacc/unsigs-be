@@ -162,6 +162,7 @@ public class UnsigsServiceImpl implements UnsigsService {
         offerE.setAmount(offer.amount);
         offerE.setTxHash(offer.txHash);
         offerE.setTxIndex(offer.txIndex);
+        offerE.setDatumHash(offer.datumHash);
 
         return offerRepository.save(offerE);
     }
