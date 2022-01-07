@@ -1,6 +1,10 @@
 package gimbalabs.unsigsbe;
 
+import gimbalabs.unsigsbe.entity.OfferEntity;
+import gimbalabs.unsigsbe.entity.UnsigDetailsEntity;
+import gimbalabs.unsigsbe.model.Offer;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.utility.ListIterate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -178,6 +182,8 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         o.unsigId = unsigId;
         o.owner = UUID.randomUUID().toString();
         o.amount = amount;
+        o.txHash = UUID.randomUUID().toString();
+        o.txIndex = Math.abs(new Random().nextInt());
         return o;
     }
 
@@ -275,6 +281,49 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     }
 
     @Test
+    public void whenCreateAndGetOffers_thenContainsOfferDetails() throws Exception {
+        offerRepository.deleteAll();
+        Page<UnsigDetailsEntity> firstTen = unsigDetailsRepository.findAll(PageRequest.of(1, 10));
+        List<UnsigDetailsEntity> content = new ArrayList(firstTen.getContent());
+        Collections.shuffle(content);
+        UnsigDetailsEntity item1 = content.get(0);
+        assertNotNull(item1);
+
+        long initialCount = offerRepository.count();
+        assertEquals(0, initialCount);
+
+        String unsigId = item1.getUnsigId();
+        Offer o = newOffer(unsigId, 1020L);
+        MockHttpServletResponse response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse();
+
+        long newCount0 = offerRepository.count();
+        assertEquals(initialCount + 1, newCount0);
+
+        response = mockMvc.perform(
+                        get("/api/v1/unsigs/{id}".replaceFirst("\\{id\\}", unsigId))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("{class-name}-{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
+        Map<String, Object> map = jsonParser.parseMap(response.getContentAsString());
+        assertEquals(unsigId, map.get("unsigId"));
+        Map offerDetailsMap = (Map) map.get("offerDetails");
+        assertEquals(unsigId, offerDetailsMap.get("unsigId"));
+        assertEquals(o.owner, offerDetailsMap.get("owner"));
+        assertEquals(o.amount, Long.valueOf((Integer) offerDetailsMap.get("amount")));
+    }
+
+    @Test
     public void givenMasterDataLoaded_whenListOrGet_thenOk() throws Exception {
         String contentString = Files.readString(Path.of("src/test/resources/unsigs-test.json"));
         Map<String, Object> map = jsonParser.parseMap(contentString);
@@ -336,6 +385,25 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
 
         assertEquals(25, usIds.size());
 
+        //create an offer for first 2, last one
+        offerRepository.deleteAll();
+        MutableList<UnsigDetailsEntity> offerList = FastList.newList();
+        offerList.add(set1.getContent().get(0));
+        offerList.add(set1.getContent().get(2));
+        offerList.add(set2.getContent().get(set2.getSize() - 1));
+
+        for (UnsigDetailsEntity item : offerList) {
+            String unsigId = item.getUnsigId();
+            Offer o = newOffer(unsigId, Math.abs(new Random().nextLong()));
+            mockMvc.perform(
+                            put("/api/v1/offers")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .content(asJsonString(o)))
+                    .andExpect(status().isAccepted());
+        }
+
+
         MockHttpServletResponse response = mockMvc.perform(
                         post("/api/v1/unsigs/find")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -365,6 +433,32 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         boolean b = unsigsService.loadMasterData();
         assertTrue(b);
         assertEquals(countUnsigs, unsigDetailsRepository.count());
+    }
+
+
+    @Test
+    public void givenAssetString_whenGetLastTransaction_thenOk() throws Exception {
+
+        String assetString = "1e82bbd44f7bd555a8bcc829bd4f27056e86412fbb549efdbf78f42d756e7369673030303137";
+        // 1e82bbd44f7bd555a8bcc829bd4f27056e86412fbb549efdbf78f42d.unsig00017
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/last-transaction/{asset}".replaceFirst("\\{asset\\}", assetString))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document("{class-name}-{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
+        Map<String, Object> at = jsonParser.parseMap(response.getContentAsString());
+
+        assertNotNull(at);
+        assertNotNull(at.get("txHash"));
+        assertNotNull(at.get("txIndex"));
+        assertNotNull(at.get("blockHeight"));
+        assertNotNull(at.get("blockTime"));
+
     }
 
 

@@ -2,7 +2,14 @@ package gimbalabs.unsigsbe;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gimbalabs.unsigsbe.dto.OfferDto;
+import gimbalabs.unsigsbe.dto.TrimmedOfferDto;
+import gimbalabs.unsigsbe.dto.UnsigDto;
+import gimbalabs.unsigsbe.entity.OfferEntity;
+import gimbalabs.unsigsbe.entity.UnsigDetailsEntity;
 import gimbalabs.unsigsbe.exception.ApiException;
+import gimbalabs.unsigsbe.model.Offer;
+import gimbalabs.unsigsbe.model.UnsigDetails;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function2;
@@ -39,8 +46,8 @@ import static gimbalabs.unsigsbe.Constants.*;
 @Service
 public class UnsigsServiceImpl implements UnsigsService {
 
-    private final OfferRepository offerRepository;
     private final UnsigDetailsRepository unsigDetailsRepository;
+    private final OfferRepository offerRepository;
     private final JacksonJsonParser jsonParser;
     private final ObjectMapper objectMapper;
 
@@ -106,17 +113,36 @@ public class UnsigsServiceImpl implements UnsigsService {
     public UnsigDto getUnsig(String unsigId) {
         UnsigDetailsEntity unsigE = unsigDetailsRepository.findByUnsigId(unsigId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Given Unsig not found"));
-        return new UnsigDto(unsigId, jsonParser.parseMap(unsigE.getDetails()));
+        UnsigDto dto = buildUnsigDto(unsigId, unsigE.getDetails());
+        return dto;
+    }
+
+    private UnsigDto buildUnsigDto(String unsigId, String unsigDetails) {
+        UnsigDto dto = UnsigDto.builder()
+                .unsigId(unsigId)
+                .details(jsonParser.parseMap(unsigDetails))
+                .build();
+        Optional<OfferEntity> offerForUnsigOp = offerRepository.findByUnsigId(unsigId);
+        if (offerForUnsigOp.isPresent()) {
+            dto.setOfferDetails(buildTrimmedOfferDto(offerForUnsigOp.get()));
+        }
+        return dto;
     }
 
     @Override
     public MutableList<UnsigDto> getUnsigs(MutableList<String> unsigIds) {
         List<UnsigDetailsEntity> unsigEs = unsigDetailsRepository.findByUnsigIdIn(unsigIds);
-        return ListIterate.collect(unsigEs, e -> new UnsigDto(e.getUnsigId(), jsonParser.parseMap(e.getDetails())));
+        return ListIterate.collect(unsigEs, e -> buildUnsigDto(e.getUnsigId(), e.getDetails()));
     }
 
     private OfferDto buildOfferDto(OfferEntity e) {
         OfferDto dto = new OfferDto();
+        BeanUtils.copyProperties(e, dto);
+        return dto;
+    }
+
+    private TrimmedOfferDto buildTrimmedOfferDto(OfferEntity e) {
+        TrimmedOfferDto dto = new TrimmedOfferDto();
         BeanUtils.copyProperties(e, dto);
         return dto;
     }
@@ -134,6 +160,8 @@ public class UnsigsServiceImpl implements UnsigsService {
         }
         offerE.setOwner(offer.owner);
         offerE.setAmount(offer.amount);
+        offerE.setTxHash(offer.txHash);
+        offerE.setTxIndex(offer.txIndex);
 
         return offerRepository.save(offerE);
     }
@@ -242,11 +270,9 @@ public class UnsigsServiceImpl implements UnsigsService {
             return resultMap;
         }
 
-        MutableList<Object> content = ListIterate.collect(result,
-                e -> UnifiedMap.newWithKeysValues(
-                        "unsigId", e.getUnsigId(),
-                        "details", jsonParser.parseMap(e.getDetails())
-                ));
+        MutableList<UnsigDto> content = ListIterate.collect(result,
+                e -> buildUnsigDto(e.getUnsigId(), e.getDetails())
+        );
         resultMap.put(RESULT_LIST, content);
         resultMap.put(LIST_SIZE, content.size());
         resultMap.put(TOTAL_PAGES, 1);

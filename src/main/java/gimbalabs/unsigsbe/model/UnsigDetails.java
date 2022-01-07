@@ -1,4 +1,4 @@
-package gimbalabs.unsigsbe;
+package gimbalabs.unsigsbe.model;
 
 import javax.validation.constraints.NotNull;
 

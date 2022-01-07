@@ -7,7 +7,7 @@
 ```
     [source,http,options="nowrap"]
     ----
-    GET /api/v1/unsigs/unsig09523 HTTP/1.1
+    GET /api/v1/unsigs/unsig00000 HTTP/1.1
     Content-Type: application/json
     Accept: application/json
     Host: localhost:8080
@@ -26,7 +26,7 @@
     Vary: Access-Control-Request-Method
     Vary: Access-Control-Request-Headers
     Content-Type: application/json
-    Content-Length: 248
+    Content-Length: 273
     
     {
       "unsigId" : "unsig00000",
@@ -40,7 +40,8 @@
           "rotations" : [ ]
         },
         "unsigId" : "unsig00000"
-      }
+      },
+      "offerDetails" : null
     }
     ----
 
@@ -112,7 +113,7 @@
 ```
 
 
-### List unsigs with ids
+### List unsigs by ids
 
 
 - Request
@@ -142,7 +143,7 @@
     Vary: Access-Control-Request-Method
     Vary: Access-Control-Request-Headers
     Content-Type: application/json
-    Content-Length: 8072
+    Content-Length: 9392
     
     {
       "hasNextPage" : false,
@@ -160,7 +161,28 @@
             "rotations" : [ 0, 180 ]
           },
           "unsigId" : "unsig00030"
+        },
+        "offerDetails" : {
+          "unsigId" : "unsig00030",
+          "owner" : "5c5bd1b3-3088-4a99-afab-a2c381dc09b5",
+          "amount" : 2296166838706248127,
+          "txHash" : "324c3b41-c2ac-48f5-a09a-2ff797dfea43",
+          "txIndex" : 1764895417
         }
+      }, {
+        "unsigId" : "unsig00068",
+        "details" : {
+          "index" : 68,
+          "num_props" : 2,
+          "properties" : {
+            "multipliers" : [ 0.5, 2 ],
+            "colors" : [ "Green", "Red" ],
+            "distributions" : [ "CDF", "CDF" ],
+            "rotations" : [ 0, 180 ]
+          },
+          "unsigId" : "unsig00068"
+        },
+        "offerDetails" : null
       }, 
       ...
       ...
@@ -177,6 +199,13 @@
             "rotations" : [ 0, 0 ]
           },
           "unsigId" : "unsig00069"
+        },
+        "offerDetails" : {
+          "unsigId" : "unsig00069",
+          "owner" : "6cb69424-8ae9-40b0-bb39-7ccb4bedd818",
+          "amount" : 1634258377742717101,
+          "txHash" : "964a876b-e91a-4d28-9436-466a7815193b",
+          "txIndex" : 1692115815
         }
       } ]
     }

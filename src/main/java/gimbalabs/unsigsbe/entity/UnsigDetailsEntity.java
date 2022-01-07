@@ -1,4 +1,4 @@
-package gimbalabs.unsigsbe;
+package gimbalabs.unsigsbe.entity;
 
 import javax.persistence.*;
 

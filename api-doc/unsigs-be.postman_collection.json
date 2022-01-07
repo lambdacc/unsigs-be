@@ -1,30 +1,38 @@
 {
-	"variables": [],
 	"info": {
+		"_postman_id": "2bbe4b67-b108-47a1-aba3-714ac579ad49",
 		"name": "unsigs-be",
-		"_postman_id": "b633dc32-e7a4-3cc3-b5fe-45c49e6fb04e",
-		"description": "",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Ping the server",
 			"request": {
-				"url": "http://localhost:8088/api/v1/ping/",
 				"method": "GET",
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					},
 					{
 						"key": "Accept",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					}
 				],
-				"body": {},
+				"url": {
+					"raw": "http://localhost:8088/api/v1/ping/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"ping",
+						""
+					]
+				},
 				"description": "Ping the server. This just tells you if the server is up."
 			},
 			"response": []
@@ -32,23 +40,34 @@
 		{
 			"name": "Create / update offer",
 			"request": {
-				"url": "http://localhost:8088/api/v1/offers/",
 				"method": "PUT",
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					},
 					{
 						"key": "Accept",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
 					"raw": " {\n    \"unsigId\" : \"unsig00100\",\n    \"owner\" : \"2341asd-1e40-40a8-b4a2-0201a4c93ecf\",\n    \"amount\" : 999\n    }"
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/v1/offers/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"offers",
+						""
+					]
 				},
 				"description": "Create or update offer"
 			},
@@ -57,10 +76,21 @@
 		{
 			"name": "List offers",
 			"request": {
-				"url": "http://localhost:8088/api/v1/offers",
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"url": {
+					"raw": "http://localhost:8088/api/v1/offers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"offers"
+					]
+				},
 				"description": "Paginated listing of latest offers"
 			},
 			"response": []
@@ -68,23 +98,33 @@
 		{
 			"name": "Delete offers",
 			"request": {
-				"url": "http://localhost:8088/api/v1/offers",
 				"method": "DELETE",
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					},
 					{
 						"key": "Accept",
-						"value": "application/json",
-						"description": ""
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
 					"raw": " {\n    \"unsigId\" : \"unsig00100\",\n    \"owner\" : \"2341asd-1e40-40a8-b4a2-0201a4c93ecf\",\n    \"amount\" : 999\n    }"
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/v1/offers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"offers"
+					]
 				},
 				"description": "Paginated listing of latest offers"
 			},
@@ -93,6 +133,8 @@
 		{
 			"name": "List unsigs",
 			"request": {
+				"method": "GET",
+				"header": [],
 				"url": {
 					"raw": "http://localhost:8088/api/v1/unsigs?pageNo=0&pageSize=10",
 					"protocol": "http",
@@ -108,33 +150,115 @@
 					"query": [
 						{
 							"key": "pageNo",
-							"value": "0",
-							"equals": true,
-							"description": ""
+							"value": "0"
 						},
 						{
 							"key": "pageSize",
-							"value": "10",
-							"equals": true,
-							"description": ""
+							"value": "10"
 						}
-					],
-					"variable": []
+					]
 				},
-				"method": "GET",
-				"header": [],
-				"body": {},
 				"description": "Paginated listing of unsigs"
 			},
 			"response": []
 		},
 		{
-			"name": "Load unsig master data",
+			"name": "Get one unsig by id",
 			"request": {
-				"url": "http://localhost:8088/api/v1/load-data",
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/v1/unsigs/unsig00017",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"unsigs",
+						"unsig00017"
+					]
+				},
+				"description": "Paginated listing of unsigs"
+			},
+			"response": []
+		},
+		{
+			"name": "Get asset transaction from blockfrost",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/v1/last-transaction/1e82bbd44f7bd555a8bcc829bd4f27056e86412fbb549efdbf78f42d756e7369673030303137",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"last-transaction",
+						"1e82bbd44f7bd555a8bcc829bd4f27056e86412fbb549efdbf78f42d756e7369673030303137"
+					]
+				},
+				"description": "Paginated listing of unsigs"
+			},
+			"response": []
+		},
+		{
+			"name": "List mutiple unsigs by ids",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[ \"unsig00030\", \"unsig00031\", \"unsig00032\", \"unsig00033\", \"unsig00034\", \"unsig00035\", \"unsig00036\", \"unsig00037\", \"unsig00038\", \"unsig00039\", \"unsig00040\", \"unsig00041\", \"unsig00042\", \"unsig00043\", \"unsig00044\", \"unsig00060\", \"unsig00061\", \"unsig00062\", \"unsig00063\", \"unsig00064\", \"unsig00065\", \"unsig00066\", \"unsig00067\", \"unsig00068\", \"unsig00069\" ]"
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/v1/unsigs/find",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"unsigs",
+						"find"
+					]
+				},
+				"description": "Load unsig master data"
+			},
+			"response": []
+		},
+		{
+			"name": "Load unsig master data Copy",
+			"request": {
 				"method": "POST",
 				"header": [],
-				"body": {},
+				"url": {
+					"raw": "http://localhost:8088/api/v1/load-data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"load-data"
+					]
+				},
 				"description": "Load unsig master data"
 			},
 			"response": []
@@ -142,6 +266,8 @@
 		{
 			"name": "List offers with params",
 			"request": {
+				"method": "GET",
+				"header": [],
 				"url": {
 					"raw": "http://localhost:8088/api/v1/offers?pageNo=0&pageSize=5&order=A",
 					"protocol": "http",
@@ -157,28 +283,18 @@
 					"query": [
 						{
 							"key": "pageNo",
-							"value": "0",
-							"equals": true,
-							"description": ""
+							"value": "0"
 						},
 						{
 							"key": "pageSize",
-							"value": "5",
-							"equals": true,
-							"description": ""
+							"value": "5"
 						},
 						{
 							"key": "order",
-							"value": "A",
-							"equals": true,
-							"description": ""
+							"value": "A"
 						}
-					],
-					"variable": []
+					]
 				},
-				"method": "GET",
-				"header": [],
-				"body": {},
 				"description": "Get all offers at present - Second page"
 			},
 			"response": []
