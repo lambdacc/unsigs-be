@@ -2,6 +2,7 @@ package gimbalabs.unsigsbe;
 
 import gimbalabs.unsigsbe.entity.OfferEntity;
 import gimbalabs.unsigsbe.entity.UnsigDetailsEntity;
+import gimbalabs.unsigsbe.model.AssetAddressUtxo;
 import gimbalabs.unsigsbe.model.Offer;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.mutable.FastList;
@@ -45,6 +46,8 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     OfferRepository offerRepository;
     @Autowired
     UnsigsService unsigsService;
+    @Autowired
+    BlockfrostAdapter blockfrostAdapter;
     @Autowired
     UnsigDetailsRepository unsigDetailsRepository;
     private MockMvc mockMvc;
@@ -464,6 +467,86 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         assertNotNull(at.get("txIndex"));
         assertNotNull(at.get("blockHeight"));
         assertNotNull(at.get("blockTime"));
+
+    }
+
+    @Test
+    public void givenAddressAndAssetId_whenGetUtxo_thenOk() throws Exception {
+
+        //sundaeswap testnet
+        /*AssetAddressUtxo(txHash=7b62472ef03eb3df38a394bbf4276ac468374c914e1205f93c3391b3dd8e6e22,
+                outputIndex=0, amount=[TransactionOutputAmount(unit=lovelace, quantity=162892143504),
+                TransactionOutputAmount(unit=57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c,
+                        quantity=8242384190), TransactionOutputAmount(unit=d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f70200a, quantity=1)],
+        block=e04dddc8eaeb8b146238f1212c86d86c3da4f61856a03e745a7c64a8b31aec69, dataHash=bebf8c47a46af9c75f8761ab1aa60baa8fa4d84c8e4b387f45e81c9cd1f820a9)
+        */
+        String assetString = "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c";
+        String address = "addr_test1wp9m8xkpt2tmy7madqldspgzgug8f2p3pwhz589cq75685slenwf4";
+
+        AssetAddressUtxo assetUtxoAtAddress = blockfrostAdapter.getAssetUtxoAtAddress(
+                address,
+                assetString
+        );
+        assertNotNull(assetUtxoAtAddress);
+
+        String datumHash = assetUtxoAtAddress.getDataHash();
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/utxo")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .param("address",address)
+                                .param("unsigAsset",assetString)
+                                .param("datumHash",datumHash)
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        Map<String, Object> map = jsonParser.parseMap(response.getContentAsString());
+
+        assertTrue(map.size() > 0);
+
+        assertEquals(datumHash, map.get("dataHash"));
+    }
+
+    @Test
+    public void givenAddressAndAssetIdButIncorrectDatum_whenGetUtxo_throwsDatumMismatchException() throws Exception {
+
+        //sundaeswap testnet
+        /*AssetAddressUtxo(txHash=7b62472ef03eb3df38a394bbf4276ac468374c914e1205f93c3391b3dd8e6e22,
+                outputIndex=0, amount=[TransactionOutputAmount(unit=lovelace, quantity=162892143504),
+                TransactionOutputAmount(unit=57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c,
+                        quantity=8242384190), TransactionOutputAmount(unit=d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f70200a, quantity=1)],
+        block=e04dddc8eaeb8b146238f1212c86d86c3da4f61856a03e745a7c64a8b31aec69, dataHash=bebf8c47a46af9c75f8761ab1aa60baa8fa4d84c8e4b387f45e81c9cd1f820a9)
+        */
+        String assetString = "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c";
+        String address = "addr_test1wp9m8xkpt2tmy7madqldspgzgug8f2p3pwhz589cq75685slenwf4";
+
+        AssetAddressUtxo assetUtxoAtAddress = blockfrostAdapter.getAssetUtxoAtAddress(
+                address,
+                assetString
+        );
+        assertNotNull(assetUtxoAtAddress);
+
+        String datumHash = new StringBuilder(assetUtxoAtAddress.getDataHash()).reverse().toString();
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        get("/api/v1/utxo")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .param("address",address)
+                                .param("unsigAsset",assetString)
+                                .param("datumHash",datumHash)
+                )
+                .andExpect(status().isUnprocessableEntity())
+                .andDo(document("{class-name}-{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
+        Map<String, Object> map = jsonParser.parseMap(response.getContentAsString());
+
+        assertTrue(map.size() > 0);
+        assertNotNull(map.get("message"));
 
     }
 

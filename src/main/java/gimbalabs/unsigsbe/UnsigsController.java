@@ -2,14 +2,18 @@ package gimbalabs.unsigsbe;
 
 import gimbalabs.unsigsbe.dto.UnsigDto;
 import gimbalabs.unsigsbe.entity.OfferEntity;
+import gimbalabs.unsigsbe.exception.DatumMismatchException;
+import gimbalabs.unsigsbe.model.AssetAddressUtxo;
 import gimbalabs.unsigsbe.model.AssetTransaction;
 import gimbalabs.unsigsbe.model.Offer;
 import lombok.AllArgsConstructor;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
+import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -94,5 +98,28 @@ public class UnsigsController {
 
         return ok(blockfrostAdapter.getLatestAssetTransaction(asset));
     }
+
+    @GetMapping("/utxo")
+    public ResponseEntity<AssetAddressUtxo> getUtxoInfo(
+            @NotEmpty @RequestParam String address,
+            @NotEmpty @RequestParam String unsigAsset,
+            @RequestParam String datumHash
+
+    ) {
+        AssetAddressUtxo assetUtxoAtAddress = blockfrostAdapter.getAssetUtxoAtAddress(address, unsigAsset);
+        if (assetUtxoAtAddress == null) {
+            return notFound().build();
+        }
+
+        if (!assetUtxoAtAddress.getDataHash().equals(datumHash)) {
+            throw new DatumMismatchException(
+                    "Expected datumHash is : " + datumHash + " whereas obtained datumHash is : " + assetUtxoAtAddress.getDataHash(),
+                    HttpStatus.UNPROCESSABLE_ENTITY
+                    );
+        }
+
+        return ok(assetUtxoAtAddress);
+    }
+
 
 }
