@@ -163,3 +163,100 @@
     }
     ----
 ```
+
+
+### List offers by unsig ids
+
+
+- Request
+
+`Endpoint : /api/v1/offers/find`
+
+```
+    [source,http,options="nowrap"]
+    ----
+    POST /api/v1/offers/find HTTP/1.1
+    Content-Type: application/json
+    Accept: application/json
+    Content-Length: 58
+    Host: localhost:8080
+    
+    [ "unsig00018", "unsig00019", "unsig00016", "unsig00012" ]
+    ----
+```
+
+- Response
+
+```
+  [source,http,options="nowrap"]
+    ----
+    HTTP/1.1 200 OK
+    Vary: Origin
+    Vary: Access-Control-Request-Method
+    Vary: Access-Control-Request-Headers
+    Content-Type: application/json
+    Content-Length: 1686
+    
+    {
+      "hasNextPage" : false,
+      "totalPages" : 1,
+      "listSize" : 3,
+      "resultList" : [ {
+        "txHash" : "1fddc43d-68c2-476a-a1b8-992654893921",
+        "txIndex" : 12349073,
+        "datumHash" : "78739e29-44cd-47ff-aad0-f474b2bac9a5",
+        "unsigId" : "unsig00016",
+        "owner" : "3b6cc813-cc81-4754-9f68-7fdb66087fab",
+        "amount" : 3030,
+        "details" : {
+          "index" : 16,
+          "num_props" : 2,
+          "properties" : {
+            "multipliers" : [ 0.5, 1 ],
+            "colors" : [ "Blue", "Green" ],
+            "distributions" : [ "CDF", "CDF" ],
+            "rotations" : [ 0, 0 ]
+          },
+          "unsigId" : "unsig00016"
+        }
+      }, {
+        "txHash" : "02bdb0d2-4f6c-4b06-90ab-6fe9c9839c3e",
+        "txIndex" : 1136370661,
+        "datumHash" : "4b3d3c86-33fd-44eb-af75-cb75bb09b3b0",
+        "unsigId" : "unsig00018",
+        "owner" : "cfacafd0-7d61-400b-acbb-67f00304b1d3",
+        "amount" : 1020,
+        "details" : {
+          "index" : 18,
+          "num_props" : 2,
+          "properties" : {
+            "multipliers" : [ 0.5, 1 ],
+            "colors" : [ "Blue", "Green" ],
+            "distributions" : [ "CDF", "CDF" ],
+            "rotations" : [ 0, 180 ]
+          },
+          "unsigId" : "unsig00018"
+        }
+      }, {
+        "txHash" : "36111ead-a5d9-4018-94b3-c5d066f51697",
+        "txIndex" : 1180481274,
+        "datumHash" : "1a91f680-8518-4133-9b02-63c990d4082d",
+        "unsigId" : "unsig00019",
+        "owner" : "b2c9256f-560a-4e65-ac75-5c8c77ba4d6c",
+        "amount" : 2020,
+        "details" : {
+          "index" : 19,
+          "num_props" : 2,
+          "properties" : {
+            "multipliers" : [ 0.5, 1 ],
+            "colors" : [ "Blue", "Red" ],
+            "distributions" : [ "CDF", "CDF" ],
+            "rotations" : [ 0, 0 ]
+          },
+          "unsigId" : "unsig00019"
+        }
+      } ]
+    }
+    ----
+
+```

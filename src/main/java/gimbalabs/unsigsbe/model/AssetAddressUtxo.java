@@ -19,6 +19,8 @@ public class AssetAddressUtxo {
     private List<TransactionOutputAmount> amount = new ArrayList();
     private String block;
     private String dataHash;
+    private String asset;
+    private String assetQuantity;
 
 }
 

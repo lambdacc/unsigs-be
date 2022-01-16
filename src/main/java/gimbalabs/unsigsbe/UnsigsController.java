@@ -6,8 +6,10 @@ import gimbalabs.unsigsbe.exception.DatumMismatchException;
 import gimbalabs.unsigsbe.model.AssetAddressUtxo;
 import gimbalabs.unsigsbe.model.AssetTransaction;
 import gimbalabs.unsigsbe.model.Offer;
+import gimbalabs.unsigsbe.model.TransactionOutputAmount;
 import lombok.AllArgsConstructor;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.utility.ListIterate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -76,6 +78,16 @@ public class UnsigsController {
         return ok(service.findUnsigsByIds(unsigIds));
     }
 
+    @PostMapping("/offers/find")
+    public ResponseEntity<Map<String, Object>> findOffersByIds(
+            @RequestBody(required = true) List<String> unsigIds) {
+
+        if (unsigIds.size() > 30) {
+            throw new RuntimeException("Requested content size above limit");
+        }
+        return ok(service.findOffersByUnsigIds(unsigIds));
+    }
+
     @GetMapping("/unsigs/{id}")
     public ResponseEntity<UnsigDto> getUnsig(
             @PathVariable String id) {
@@ -116,6 +128,12 @@ public class UnsigsController {
                     "Expected datumHash is : " + datumHash + " whereas obtained datumHash is : " + assetUtxoAtAddress.getDataHash(),
                     HttpStatus.UNPROCESSABLE_ENTITY
                     );
+        }
+
+        TransactionOutputAmount assetTxOut = ListIterate.detect(assetUtxoAtAddress.getAmount(), e -> e.getUnit().equals(unsigAsset));
+        if (assetTxOut != null) {
+            assetUtxoAtAddress.setAsset(assetTxOut.getUnit());
+            assetUtxoAtAddress.setAssetQuantity(assetTxOut.getQuantity());
         }
 
         return ok(assetUtxoAtAddress);

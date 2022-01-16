@@ -433,6 +433,76 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         assertTrue(rspIds.allSatisfy(e -> usIds.contains(e)));
     }
 
+    @Test
+    public void givenOffersCreated_whenFindOffersByUnsigIds_thenOk() throws Exception {
+
+        offerRepository.deleteAll();
+        Page<UnsigDetailsEntity> firstTen = unsigDetailsRepository.findAll(PageRequest.of(1, 10));
+        List<UnsigDetailsEntity> content = new ArrayList(firstTen.getContent());
+        Collections.shuffle(content);
+        UnsigDetailsEntity item1 = content.get(0);
+        UnsigDetailsEntity item2 = content.get(1);
+        UnsigDetailsEntity item3 = content.get(2);
+        UnsigDetailsEntity item4 = content.get(3);
+
+        assertNotNull(item1);
+        assertNotNull(item2);
+        assertNotNull(item3);
+
+        long initialCount = offerRepository.count();
+        assertEquals(0, initialCount);
+
+        Offer o = newOffer(item1.getUnsigId(), 1020L);
+        MockHttpServletResponse response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse();
+        o = newOffer(item2.getUnsigId(), 2020L);
+        response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse();
+        o = newOffer(item3.getUnsigId(), 3030L);
+        response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse();
+
+        long newCount0 = offerRepository.count();
+        assertEquals(initialCount + 3, newCount0);
+
+        response = mockMvc.perform(
+                        post("/api/v1/offers/find")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(List.of(item1.getUnsigId(),item2.getUnsigId(),item3.getUnsigId(),item4.getUnsigId())))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("{class-name}-{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
+        Map<String, Object> map = jsonParser.parseMap(response.getContentAsString());
+        List<Map> resList = (List<Map>) map.get(RESULT_LIST);
+        assertEquals(3, resList.size());
+
+        MutableList<Object> resUnsigIds = ListIterate.collect(resList, e -> e.get("unsigId"));
+        assertTrue(resUnsigIds.contains(item1.getUnsigId()));
+        assertTrue(resUnsigIds.contains(item2.getUnsigId()));
+        assertTrue(resUnsigIds.contains(item3.getUnsigId()));
+        assertFalse(resUnsigIds.contains(item4.getUnsigId()));
+    }
+
     private void loadUnsigMasterData() throws IOException {
         String contentString = Files.readString(Path.of("src/test/resources/unsigs-test.json"));
         Map<String, Object> map = jsonParser.parseMap(contentString);
@@ -500,6 +570,8 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                                 .param("datumHash",datumHash)
                 )
                 .andExpect(status().isOk())
+                .andDo(document("{class-name}-{method-name}-find",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
                 .andReturn().getResponse();
 
         Map<String, Object> map = jsonParser.parseMap(response.getContentAsString());
