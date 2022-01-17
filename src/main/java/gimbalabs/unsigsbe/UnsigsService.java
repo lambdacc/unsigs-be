@@ -18,7 +18,7 @@ public interface UnsigsService {
 
     UnsigDto getUnsig(String unsigId);
 
-    MutableList<UnsigDto> getUnsigs(MutableList<String> unsigIds);
+    MutableList<UnsigDto> getUnsigs(List<String> unsigIds);
 
     OfferEntity saveOffer(Offer offer);
 
@@ -29,4 +29,5 @@ public interface UnsigsService {
     boolean loadMasterData() throws IOException;
 
     Map<String, Object> findUnsigsByIds(List<String> unsigIds);
+    Map<String, Object> findOffersByUnsigIds(List<String> unsigIds);
 }

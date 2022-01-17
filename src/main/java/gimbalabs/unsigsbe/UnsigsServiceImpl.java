@@ -130,7 +130,7 @@ public class UnsigsServiceImpl implements UnsigsService {
     }
 
     @Override
-    public MutableList<UnsigDto> getUnsigs(MutableList<String> unsigIds) {
+    public MutableList<UnsigDto> getUnsigs(List<String> unsigIds) {
         List<UnsigDetailsEntity> unsigEs = unsigDetailsRepository.findByUnsigIdIn(unsigIds);
         return ListIterate.collect(unsigEs, e -> buildUnsigDto(e.getUnsigId(), e.getDetails()));
     }
@@ -276,6 +276,34 @@ public class UnsigsServiceImpl implements UnsigsService {
         );
         resultMap.put(RESULT_LIST, content);
         resultMap.put(LIST_SIZE, content.size());
+        resultMap.put(TOTAL_PAGES, 1);
+        resultMap.put(HAS_NEXT_PAGE, false);
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> findOffersByUnsigIds(List<String> unsigIds) {
+        MutableList<String> filteredUnsigIds = ListIterate.select(unsigIds, Predicates.notNull());
+        List<OfferEntity> result = offerRepository.findByUnsigIdIn(filteredUnsigIds);
+        Map<String, Object> resultMap = Util.newPagedResponseMap();
+        if (result.isEmpty()) {
+            return resultMap;
+        }
+
+        unsigIds = ListIterate.collect(result, e -> e.getUnsigId());
+        MutableList<UnsigDto> unsigDtos = getUnsigs(unsigIds);
+
+        MutableList<OfferDto> resultDtos = ListIterate.collectWith(result, (Function2<OfferEntity, MutableList<UnsigDto>, OfferDto>) (entity, dtos) -> {
+            String id = entity.getUnsigId();
+            UnsigDto d = dtos.detect(Predicates.attributeEqual(UnsigDto::getUnsigId, id));
+            OfferDto offerDto = buildOfferDto(entity);
+            offerDto.setDetails(d != null ? d.getDetails() : UnifiedMap.newMap());
+            return offerDto;
+
+        }, unsigDtos);
+
+        resultMap.put(RESULT_LIST, resultDtos);
+        resultMap.put(LIST_SIZE, resultDtos.size());
         resultMap.put(TOTAL_PAGES, 1);
         resultMap.put(HAS_NEXT_PAGE, false);
         return resultMap;

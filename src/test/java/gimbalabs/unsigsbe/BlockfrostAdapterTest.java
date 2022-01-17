@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import gimbalabs.unsigsbe.model.AssetAddressUtxo;
 import gimbalabs.unsigsbe.model.AssetTransaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -97,6 +98,36 @@ public class BlockfrostAdapterTest extends UnsigsBeApplicationTests {
         assertNotNull(at.getTxIndex());
         assertNotNull(at.getBlockHeight());
         assertNotNull(at.getBlockTime());
+    }
+
+    @Test
+    public void givenGetAssetAndAddress_whenGetUtxoAtAddress_thenReturnsLatestAssetTransaction() throws Exception {
+
+/*
+        String assetString = "1e82bbd44f7bd555a8bcc829bd4f27056e86412fbb549efdbf78f42d756e7369673030303036";
+        //unsig-
+        //String address = "addr_test1wp8zdhctf4cmf4uuy4twnma56f8n9q4up29ayy6msnpjxqgrplfzt";
+        // 1e82bbd44f7bd555a8bcc829bd4f27056e86412fbb549efdbf78f42d.unsig00017
+*/
+
+
+        //sundaeswap testnet
+        /*AssetAddressUtxo(txHash=7b62472ef03eb3df38a394bbf4276ac468374c914e1205f93c3391b3dd8e6e22,
+                outputIndex=0, amount=[TransactionOutputAmount(unit=lovelace, quantity=162892143504),
+                TransactionOutputAmount(unit=57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c,
+                        quantity=8242384190), TransactionOutputAmount(unit=d311d3488cc4fef19d05634adce8534977a3bc6fc18136ad65df1d4f70200a, quantity=1)],
+        block=e04dddc8eaeb8b146238f1212c86d86c3da4f61856a03e745a7c64a8b31aec69, dataHash=bebf8c47a46af9c75f8761ab1aa60baa8fa4d84c8e4b387f45e81c9cd1f820a9)
+        */
+        String assetString = "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c";
+        String address = "addr_test1wp9m8xkpt2tmy7madqldspgzgug8f2p3pwhz589cq75685slenwf4";
+
+        AssetAddressUtxo assetUtxoAtAddress = blockfrostAdapter.getAssetUtxoAtAddress(
+                address,
+                assetString
+        );
+
+        assertNotNull(assetUtxoAtAddress);
+
     }
 
 

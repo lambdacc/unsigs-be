@@ -53,7 +53,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": " {\n    \"unsigId\" : \"unsig00100\",\n    \"owner\" : \"2341asd-1e40-40a8-b4a2-0201a4c93ecf\",\n    \"amount\" : 999\n    }"
+					"raw": "{\n      \"unsigId\" : \"unsig00015\",\n      \"owner\" : \"bfbb741c-47c9-4caf-94cf-1ad58a41c6b7\",\n      \"amount\" : 1020,\n      \"txHash\" : \"40996f2a-04ff-47bc-92d4-006e61aa7109\",\n      \"datumHash\" : \"22482892-7a50-4ede-8934-ccb2a40f86ec\",\n      \"txIndex\" : 467518258\n    }"
 				},
 				"url": {
 					"raw": "http://localhost:8088/api/v1/offers/",
@@ -186,7 +186,43 @@
 			"response": []
 		},
 		{
-			"name": "Get asset transaction from blockfrost",
+			"name": "Get utxo at address for asset",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/v1/utxo?address=addr_test1wp9m8xkpt2tmy7madqldspgzgug8f2p3pwhz589cq75685slenwf4&unsigAsset=57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c&datumHash=2da471fa0e129914c1b7b0766242570dd2a92297b424e79280c79cc6f7206774",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"utxo"
+					],
+					"query": [
+						{
+							"key": "address",
+							"value": "addr_test1wp9m8xkpt2tmy7madqldspgzgug8f2p3pwhz589cq75685slenwf4"
+						},
+						{
+							"key": "unsigAsset",
+							"value": "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652256414e494c"
+						},
+						{
+							"key": "datumHash",
+							"value": "2da471fa0e129914c1b7b0766242570dd2a92297b424e79280c79cc6f7206774"
+						}
+					]
+				},
+				"description": "Paginated listing of unsigs"
+			},
+			"response": []
+		},
+		{
+			"name": "Get asset transaction",
 			"request": {
 				"method": "GET",
 				"header": [],
