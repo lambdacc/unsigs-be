@@ -96,6 +96,42 @@
 			"response": []
 		},
 		{
+			"name": "List offers by owner",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/v1/offers?owner=2341asd-1e40-40a8-b4a2-0201a4c93ecf&pageNo=0&pageSize=12",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"offers"
+					],
+					"query": [
+						{
+							"key": "owner",
+							"value": "2341asd-1e40-40a8-b4a2-0201a4c93ecf"
+						},
+						{
+							"key": "pageNo",
+							"value": "0"
+						},
+						{
+							"key": "pageSize",
+							"value": "12"
+						}
+					]
+				},
+				"description": "Paginated listing of latest offers"
+			},
+			"response": []
+		},
+		{
 			"name": "Delete offers",
 			"request": {
 				"method": "DELETE",
