@@ -59,10 +59,10 @@ public class UnsigsServiceImpl implements UnsigsService {
     }
 
     @Override
-    public Map<String, Object> listOffers(Integer pageNo, Integer pageSize, String order) {
+    public Map<String, Object> listOffers(Integer pageNo, Integer pageSize, String order, String owner) {
         Sort sortBy = "A".equals(order) ? Sort.by(Sort.Direction.ASC, "amount") : Sort.by(Sort.Direction.DESC, "amount");
         Pageable paging = PageRequest.of(pageNo, pageSize, sortBy);
-        Page<OfferEntity> pagedResult = offerRepository.findAll(paging);
+        Page<OfferEntity> pagedResult = owner.isEmpty() ? offerRepository.findAll(paging) : offerRepository.findAllByOwnerIgnoreCase(owner, paging);
         Map<String, Object> resultMap = Util.newPagedResponseMap();
         if (pagedResult.isEmpty()) {
             return resultMap;

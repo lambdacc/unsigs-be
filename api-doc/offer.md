@@ -3,6 +3,7 @@
 - Request
 
 `Endpoint : /api/v1/offers`
+
 ```
     [source,http,options="nowrap"]
     ----
@@ -54,6 +55,7 @@
 - Request
 
 `Endpoint : /api/v1/offers`
+
 ```
     [source,http,options="nowrap"]
     ----
@@ -122,12 +124,12 @@
     ----
 ```
 
-
 ### Delete an offer
 
 - Request
 
 `Endpoint : /api/v1/offers`
+
 ```
     [source,http,options="nowrap"]
     ----
@@ -164,9 +166,7 @@
     ----
 ```
 
-
 ### List offers by unsig ids
-
 
 - Request
 
@@ -259,4 +259,80 @@
     }
     ----
 
+```
+
+### Paginated listing of offers filtered by the owner
+
+`This is similar to paginated listing of offers above. As addition to that, a new query parameter 'owner' has to be added`
+
+- Request
+
+`Endpoint : /api/v1/offers`
+
+```
+    [source,http,options="nowrap"]
+    ----
+    GET /api/v1/offers?pageNo=0&pageSize=10&owner=5d6decc3-014a-42a0-975e-ecabac7cde22 HTTP/1.1
+    Content-Type: application/json
+    Accept: application/json
+    Host: localhost:8080
+    
+    ----
+```
+
+- Response
+
+```
+    [source,http,options="nowrap"]
+    ----
+    HTTP/1.1 200 OK
+    Vary: Origin
+    Vary: Access-Control-Request-Method
+    Vary: Access-Control-Request-Headers
+    Content-Type: application/json
+    Content-Length: 1129
+    
+    {
+      "hasNextPage" : false,
+      "totalPages" : 1,
+      "listSize" : 2,
+      "resultList" : [ {
+        "txHash" : "db348ea1-ead3-4355-88ed-c0dd3f403499",
+        "txIndex" : 1518820475,
+        "datumHash" : "21b405d0-6603-492c-9ab7-3e7cd41be558",
+        "unsigId" : "unsig00010",
+        "owner" : "5d6decc3-014a-42a0-975e-ecabac7cde22",
+        "amount" : 300,
+        "details" : {
+          "index" : 10,
+          "num_props" : 1,
+          "properties" : {
+            "multipliers" : [ 2 ],
+            "colors" : [ "Blue" ],
+            "distributions" : [ "CDF" ],
+            "rotations" : [ 0 ]
+          },
+          "unsigId" : "unsig00010"
+        }
+      }, {
+        "txHash" : "c15dd0fb-3819-4c55-bad2-829e27e2bf42",
+        "txIndex" : 2048643780,
+        "datumHash" : "3c99184e-99cf-4c1b-a08c-acf9fb85697d",
+        "unsigId" : "unsig00017",
+        "owner" : "5d6decc3-014a-42a0-975e-ecabac7cde22",
+        "amount" : 100,
+        "details" : {
+          "index" : 17,
+          "num_props" : 2,
+          "properties" : {
+            "multipliers" : [ 0.5, 1 ],
+            "colors" : [ "Blue", "Green" ],
+            "distributions" : [ "CDF", "CDF" ],
+            "rotations" : [ 0, 90 ]
+          },
+          "unsigId" : "unsig00017"
+        }
+      } ]
+    }
+    ----
 ```

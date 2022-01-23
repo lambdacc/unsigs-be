@@ -69,7 +69,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     @Test
     public void givenNonExistentUnsig_whenCreateOffer_thenNotFound() throws Exception {
 
-        Offer o = newOffer(randomId(), 1020L);
+        Offer o = newOffer(randomId(), 1020L, randomString());
 
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
@@ -87,7 +87,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     public void whenCreateNewOffer_thenOk() throws Exception {
 
         String unsigId = unsigDetailsRepository.findAll(PageRequest.of(10, 10)).getContent().get(6).getUnsigId();
-        Offer o = newOffer(unsigId, 1020L);
+        Offer o = newOffer(unsigId, 1020L, randomString());
 
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
@@ -106,7 +106,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
 
         String unsigId = unsigDetailsRepository.findAll(PageRequest.of(10, 10)).getContent().get(1).getUnsigId();
         long amt = 45678L;
-        Offer o = newOffer(unsigId, amt);
+        Offer o = newOffer(unsigId, amt, randomString());
 
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
@@ -146,7 +146,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
 
         String unsigId = unsigDetailsRepository.findAll(PageRequest.of(10, 10)).getContent().get(1).getUnsigId();
         long amt = 45678L;
-        Offer o = newOffer(unsigId, amt);
+        Offer o = newOffer(unsigId, amt, randomString());
 
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
@@ -162,7 +162,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         assertEquals(amt, byUnsigId.getAmount());
 
 
-        o.owner = UUID.randomUUID().toString();
+        o.owner = randomString();
         response = mockMvc.perform(
                         delete("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -180,14 +180,14 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         return String.valueOf(Math.abs(new Random().nextLong()));
     }
 
-    private Offer newOffer(String unsigId, Long amount) {
+    private Offer newOffer(String unsigId, Long amount, String owner) {
         Offer o = new Offer();
         o.unsigId = unsigId;
-        o.owner = UUID.randomUUID().toString();
+        o.owner = owner;
         o.amount = amount;
-        o.txHash = UUID.randomUUID().toString();
+        o.txHash = randomString();
         o.txIndex = Math.abs(new Random().nextInt());
-        o.datumHash = UUID.randomUUID().toString();
+        o.datumHash = randomString();
         return o;
     }
 
@@ -206,7 +206,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         long initialCount = offerRepository.count();
         assertEquals(0, initialCount);
 
-        Offer o = newOffer(item1.getUnsigId(), 1020L);
+        Offer o = newOffer(item1.getUnsigId(), 1020L, randomString());
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -214,7 +214,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                                 .content(asJsonString(o)))
                 .andExpect(status().isAccepted())
                 .andReturn().getResponse();
-        o = newOffer(item2.getUnsigId(), 1020L);
+        o = newOffer(item2.getUnsigId(), 1020L, randomString());
         response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -227,7 +227,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         assertEquals(initialCount + 2, newCount0);
 
         //update existing - count does not change
-        o = newOffer(item2.getUnsigId(), 8888L);
+        o = newOffer(item2.getUnsigId(), 8888L, randomString());
         response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -285,6 +285,88 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
     }
 
     @Test
+    public void whenCreateAndListOffersByOwner_thenOk() throws Exception {
+        offerRepository.deleteAll();
+        Page<UnsigDetailsEntity> firstTen = unsigDetailsRepository.findAll(PageRequest.of(1, 10));
+        List<UnsigDetailsEntity> content = new ArrayList(firstTen.getContent());
+        Collections.shuffle(content);
+        UnsigDetailsEntity item1 = content.get(0);
+        UnsigDetailsEntity item2 = content.get(1);
+        UnsigDetailsEntity item3 = content.get(2);
+
+        assertNotNull(item1);
+        assertNotNull(item2);
+        assertNotNull(item3);
+
+        long initialCount = offerRepository.count();
+        assertEquals(0, initialCount);
+
+        String ownerOne = randomString();
+        String ownerTwo = randomString();
+        Offer o = newOffer(item1.getUnsigId(), 100L, ownerOne);
+        MockHttpServletResponse response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse();
+        o = newOffer(item2.getUnsigId(), 200L, ownerTwo);
+        response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse();
+        o = newOffer(item3.getUnsigId(), 300L, ownerOne);
+        response = mockMvc.perform(
+                        put("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(asJsonString(o)))
+                .andExpect(status().isAccepted())
+                .andReturn().getResponse();
+
+        long newCount0 = offerRepository.count();
+        assertEquals(3, newCount0);
+
+
+        response = mockMvc.perform(
+                        get("/api/v1/offers")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .queryParam("pageNo", "0")
+                                .queryParam("pageSize", "10")
+                                .queryParam("owner", ownerOne)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andDo(document("{class-name}-{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
+                .andReturn().getResponse();
+
+        Map<String, Object> map = jsonParser.parseMap(response.getContentAsString());
+        List<Map> resList = (List<Map>) map.get(RESULT_LIST);
+        assertEquals(2, resList.size());
+
+        //order check - default desc
+        Long firstVal = Long.valueOf((Integer) resList.get(0).get("amount"));
+        Long secondVal = Long.valueOf((Integer) resList.get(1).get("amount"));
+        assertEquals(300L, firstVal);
+        assertEquals(100L, secondVal);
+        assertEquals(item3.getUnsigId(), resList.get(0).get("unsigId"));
+        assertEquals(ownerOne, resList.get(0).get("owner"));
+        assertEquals(item1.getUnsigId(), resList.get(1).get("unsigId"));
+        assertEquals(ownerOne, resList.get(1).get("owner"));
+
+    }
+
+    private String randomString() {
+        return UUID.randomUUID().toString();
+    }
+
+    @Test
     public void whenCreateAndGetUnsigDetailsById_thenContainsOfferDetails() throws Exception {
         offerRepository.deleteAll();
         Page<UnsigDetailsEntity> firstTen = unsigDetailsRepository.findAll(PageRequest.of(1, 10));
@@ -297,7 +379,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         assertEquals(0, initialCount);
 
         String unsigId = item1.getUnsigId();
-        Offer o = newOffer(unsigId, 1020L);
+        Offer o = newOffer(unsigId, 1020L, randomString());
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -403,7 +485,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
 
         for (UnsigDetailsEntity item : offerList) {
             String unsigId = item.getUnsigId();
-            Offer o = newOffer(unsigId, Math.abs(new Random().nextLong()));
+            Offer o = newOffer(unsigId, Math.abs(new Random().nextLong()), randomString());
             mockMvc.perform(
                             put("/api/v1/offers")
                                     .contentType(MediaType.APPLICATION_JSON)
@@ -452,7 +534,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
         long initialCount = offerRepository.count();
         assertEquals(0, initialCount);
 
-        Offer o = newOffer(item1.getUnsigId(), 1020L);
+        Offer o = newOffer(item1.getUnsigId(), 1020L, randomString());
         MockHttpServletResponse response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -460,7 +542,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                                 .content(asJsonString(o)))
                 .andExpect(status().isAccepted())
                 .andReturn().getResponse();
-        o = newOffer(item2.getUnsigId(), 2020L);
+        o = newOffer(item2.getUnsigId(), 2020L, randomString());
         response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -468,7 +550,7 @@ public class UnsigsControllerIT extends UnsigsBeApplicationTests {
                                 .content(asJsonString(o)))
                 .andExpect(status().isAccepted())
                 .andReturn().getResponse();
-        o = newOffer(item3.getUnsigId(), 3030L);
+        o = newOffer(item3.getUnsigId(), 3030L, randomString());
         response = mockMvc.perform(
                         put("/api/v1/offers")
                                 .contentType(MediaType.APPLICATION_JSON)
