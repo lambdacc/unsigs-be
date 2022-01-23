@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface UnsigsService {
-    Map<String, Object> listOffers(Integer pageNo, Integer pageSize, String order);
+    Map<String, Object> listOffers(Integer pageNo, Integer pageSize, String order, String owner);
 
     Map<String, Object> listUnsigs(Integer pageNo, Integer pageSize);
 
