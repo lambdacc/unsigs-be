@@ -1,3 +1,8 @@
+FROM openjdk:16-slim AS build
+WORKDIR /src
+COPY ./ /src
+RUN ./mvnw clean install
+
 FROM openjdk:16-slim
 EXPOSE 8088
 #RUN useradd -m unsigs
@@ -5,5 +10,5 @@ EXPOSE 8088
 #WORKDIR /home/unsigs
 VOLUME /data
 VOLUME /logs
-COPY target/*.jar unsigs-be-0.1.jar
-ENTRYPOINT ["java","-jar","/unsigs-be-0.1.jar"]
+COPY --from=build /src/target/*.jar unsigs-be.jar
+ENTRYPOINT ["java","-jar","/unsigs-be.jar"]
