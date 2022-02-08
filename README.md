@@ -2,23 +2,67 @@
 
 cd $PROJECT_ROOT_DIR - This is the same directory where pom.xml is.
 
-1. Build the code base using maven wrapper.
+TESTNET
+   1. Build the code base using maven wrapper.
 
    `./mvnw clean install`
 
-2. Build docker image
+   2. Build docker image
 
-   `sudo docker build -t unsigs-be:1.0-RC .`
+      `sudo docker build -t unsigs-be:1.0 .`
+
+      Check that the image is built
+
+      `sudo docker images | grep unsigs-be`
+
+   3.  Run the docker image
+    
+          (Testnet)
+
+         `sudo docker run \
+         -p 8088:8088 --name unsigs-be \
+         -v ~/data:/data -v ~/logs:/logs \
+         -e CARDANO_NETWORK=testnet \
+         -e TESTNET_API_KEY=testnetQsmQIS9ODq4vMkgIMjZaNXkvSgm9rsiV \
+         -e MAINNET_API_KEY=- \
+         -e DS_PATH=/data/unsigs \
+         -e DS_USERNAME=us \
+         -e DS_PASSWORD=OWYV13r79ba \
+         unsigs-be:1.0 `
+
+
+MAINNET 
+
+   1. Build the code base using maven wrapper.
+
+    `./mvnw clean install -DskipTests`
+
+   2. Build docker image
+
+    `sudo docker build -t unsigs-be:1.0 .`
 
    Check that the image is built
 
-   `sudo docker images | grep unsigs-be`
+    `sudo docker images | grep unsigs-be`
 
-3. Run the docker image
+   3. Run the docker image
 
+      (Mainnet)
+      Replace variables and set your mount paths in this command. 
 
-   `sudo docker run -p 8088:8088 --name unsigs-be -v ~/data:/data -v ~/logs:/logs unsigs-be:1.0-RC`
+   `sudo docker run \
+       -p 8088:8088 --name unsigs-be \
+       -v ~/data:/data -v ~/logs:/logs \  
+       -e CARDANO_NETWORK=mainnet \  
+       -e TESTNET_API_KEY=- \
+       -e MAINNET_API_KEY=<your_key> \
+       -e DS_PATH=/data/<your_path> \
+       -e DS_USERNAME=<your_username> \
+       -e DS_PASSWORD=<your_password> \
+       unsigs-be:1.0`
 
+------------------------------------------------------------------------------
+    
 
 4. To ping the server, hit this url.
    `http://localhost:8088/api/v1/ping/`

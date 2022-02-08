@@ -17,6 +17,10 @@ public class AppConfig {
 
     @Value("${cardano.network}")
     private String cardanoNetwork;
+    @Value("${testnet.blockfrost.baseurl}")
+    private String testnetBaseUrl;
+    @Value("${mainnet.blockfrost.baseurl}")
+    private String mainnetBaseUrl;
     @Value("${testnet.api.key}")
     private String testnetApiKey;
     @Value("${mainnet.api.key}")
@@ -59,9 +63,11 @@ public class AppConfig {
                 .codecs(configurer ->
                         configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper)))
                 .build();
+        String baseUrl = cardanoNetwork.equals("mainnet") ? mainnetBaseUrl : testnetBaseUrl;
+        String apiKey = cardanoNetwork.equals("mainnet") ? mainnetApiKey : testnetApiKey;
         return WebClient.builder()
-                .baseUrl("https://cardano-testnet.blockfrost.io/api/v0")
-                .defaultHeader("project_id", testnetApiKey)
+                .baseUrl(baseUrl)
+                .defaultHeader("project_id", apiKey)
                 .defaultHeader("Accept", "application/json")
                 .exchangeStrategies(exchangeStrategies)
                 .build();

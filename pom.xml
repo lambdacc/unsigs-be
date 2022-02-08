@@ -10,7 +10,7 @@
     </parent>
     <groupId>gimbalabs</groupId>
     <artifactId>unsigs-be</artifactId>
-    <version>1.0-RC</version>
+    <version>1.0</version>
     <name>unsigs-be</name>
     <description>unsigs-be</description>
     <properties>
